@@ -32,16 +32,27 @@
 				</div>
 			</div>
 			<div class="form-group">	
+				<label class="col-sm-3 control-label">协议类型：</label>
+				<div class="col-sm-8">
+					<select id="protocolType" name="protocolType" th:field="*{protocolType}" class="form-control m-b">
+						<option value="HTTP" th:selected="${protocolType == 'HTTP' ? true : false}">HTTP</option>
+						<option value="WebSocket" th:selected="${protocolType == 'WebSocket' ? true : false}">WebSocket</option>
+						<option value="gRPC" th:selected="${protocolType == 'gRPC' ? true : false}">gRPC</option>
+						<option value="MQTT" th:selected="${protocolType == 'MQTT' ? true : false}">MQTT</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
 				<label class="col-sm-3 control-label">编码格式：</label>
 				<div class="col-sm-8">
 					<div class="radio-box">
 					  <input type="radio" th:id="encoding" name="encoding" th:field="*{encoding}" th:value="UTF-8" th:checked="${encoding == 'UTF-8' ? true : false}">
 					  <label>UTF-8编码</label>
-				    </div>
-				    <div class="radio-box">
-				      <input type="radio" th:id="encoding" name="encoding" th:field="*{encoding}" th:value="GBK" th:checked="${encoding == 'GBK' ? true : false}">
+					</div>
+					<div class="radio-box">
+					  <input type="radio" th:id="encoding" name="encoding" th:field="*{encoding}" th:value="GBK" th:checked="${encoding == 'GBK' ? true : false}">
 					  <label>GBK编码</label>
-				    </div>
+					</div>
 				</div>
 			</div>
 			<div class="form-group">	

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -16,6 +17,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.luckyframe.common.constant.ClientConstants;
 import com.luckyframe.common.utils.client.HttpRequest;
 import com.luckyframe.common.utils.client.RunTaskEntity;
+import com.luckyframe.common.utils.client.TaskAssignmentService;
+import com.luckyframe.project.system.client.domain.Client;
+import com.luckyframe.project.system.client.service.IClientService;
 import com.luckyframe.project.testexecution.taskExecute.domain.TaskExecute;
 import com.luckyframe.project.testexecution.taskExecute.service.ITaskExecuteService;
 import com.luckyframe.project.testexecution.taskScheduling.domain.TaskScheduling;
@@ -39,13 +43,18 @@ public class RunAutomationTestTask
 	@Autowired
 	private ITaskSchedulingService taskSchedulingService;
 	
+	@Autowired
+	private IClientService clientService;
+	
     private static final Logger log = LoggerFactory.getLogger(RunAutomationTestTask.class);
 	
 	public static RunAutomationTestTask runAutomationTestTask;
+	public static IClientService clientServiceStatic;
 
 	@PostConstruct
 	public void init() {
 		runAutomationTestTask = this;
+		clientServiceStatic = clientService;
 	}
 	
     public void runTask(String params) throws IOException {
@@ -61,16 +70,42 @@ public class RunAutomationTestTask
 			taskExecute.setTaskStatus(0);
 			taskExecuteService.insertTaskExecute(taskExecute);
 			
-			String url= "http://"+taskScheduling.getClient().getClientIp()+":"+ClientConstants.CLIENT_MONITOR_PORT+"/runTask";
-			RunTaskEntity runTaskEntity = new RunTaskEntity();
-			runTaskEntity.setTaskId(taskExecute.getTaskId().toString());
-			runTaskEntity.setSchedulingName(taskScheduling.getSchedulingName());
-			runTaskEntity.setLoadPath(taskScheduling.getClientDriverPath());
-			try {
-				HttpRequest.httpClientPost(url, taskScheduling.getClient(), JSONObject.toJSONString(runTaskEntity),3000);
-			} catch (ConnectException e) {
-				// TODO Auto-generated catch block
-				log.error("测试任务执行，远程链接客户端出现异常...");
+			// 获取所有可用的客户端
+			List<Client> availableClients = clientService.selectClientList(new Client());
+			
+			// 使用任务分配服务选择最合适的客户端
+			Client selectedClient = TaskAssignmentService.selectBestClient(taskScheduling, availableClients);
+			
+			if (selectedClient != null) {
+				String url= "http://"+selectedClient.getClientIp()+":"+ClientConstants.CLIENT_MONITOR_PORT+"/runTask";
+				RunTaskEntity runTaskEntity = new RunTaskEntity();
+				runTaskEntity.setTaskId(taskExecute.getTaskId().toString());
+				runTaskEntity.setSchedulingName(taskScheduling.getSchedulingName());
+				runTaskEntity.setLoadPath(taskScheduling.getClientDriverPath());
+				runTaskEntity.setTaskType(taskScheduling.getTaskType());
+				try {
+					HttpRequest.httpClientPost(url, selectedClient, JSONObject.toJSONString(runTaskEntity),3000);
+				} catch (ConnectException e) {
+					// 客户端连接失败，尝试故障转移
+					log.error("测试任务执行，远程链接客户端 {} 出现异常，尝试故障转移...", selectedClient.getClientName());
+					Client failoverClient = TaskAssignmentService.failoverTask(selectedClient.getClientIp(), taskScheduling, availableClients);
+					if (failoverClient != null) {
+						String failoverUrl= "http://"+failoverClient.getClientIp()+":"+ClientConstants.CLIENT_MONITOR_PORT+"/runTask";
+						try {
+							HttpRequest.httpClientPost(failoverUrl, failoverClient, JSONObject.toJSONString(runTaskEntity),3000);
+						} catch (ConnectException ex) {
+							log.error("故障转移失败，远程链接客户端 {} 也出现异常...", failoverClient.getClientName());
+							taskExecute.setTaskStatus(4);
+							taskExecuteService.updateTaskExecute(taskExecute);
+						}
+					} else {
+						log.error("故障转移失败，没有可用的客户端...");
+						taskExecute.setTaskStatus(4);
+						taskExecuteService.updateTaskExecute(taskExecute);
+					}
+				}
+			} else {
+				log.error("没有可用的客户端执行任务...");
 				taskExecute.setTaskStatus(4);
 				taskExecuteService.updateTaskExecute(taskExecute);
 			}

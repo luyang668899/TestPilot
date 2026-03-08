@@ -3,6 +3,7 @@ package com.luckyframe.project.testmanagmt.projectCaseParams.service;
 import java.util.List;
 
 import com.luckyframe.project.testmanagmt.projectCaseParams.domain.ProjectCaseParams;
+import com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment;
 
 /**
  * 用例公共参数 服务层
@@ -39,15 +40,25 @@ public interface IProjectCaseParamsService
 	/**
 	 * 根据项目ID和环境查询所有项目中以及当前项目下的公共参数
 	 * @param projectId 项目ID
+	 * @param environmentId 环境ID
 	 * @author Seagull
 	 * @date 2019年6月18日
 	 */
-	List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvName(Integer projectId,String envName);
-
+	List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvironmentId(Integer projectId, Integer environmentId);
+	
+	/**
+	 * 根据项目ID和环境名称查询所有项目中以及当前项目下的公共参数
+	 * @param projectId 项目ID
+	 * @param envName 环境名称
+	 * @author Seagull
+	 * @date 2019年6月18日
+	 */
+	List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvName(Integer projectId, String envName);
+	
 	/**
 	 * 根据项目ID查询该项目下所有的环境
-	 * @param projectId
-	 * @return
+	 * @param projectId 项目ID
+	 * @return 环境列表
 	 */
 	List<String> selectProjectEnvListByProjectId(Integer projectId);
 	

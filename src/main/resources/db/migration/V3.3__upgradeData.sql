@@ -35,4 +35,4 @@ insert ignore into `luckyframe`.`sys_menu` (`menu_id`, `menu_name`, `parent_id`,
 -- ----------------------------
 -- 4、调度任务中增加第三方推送指定URL 例如：钉钉、企业微信
 -- ----------------------------
-alter table task_scheduling add push_url varchar(200) comment '第三方推送地址URL';
+ALTER TABLE task_scheduling ADD COLUMN IF NOT EXISTS push_url varchar(200) comment '第三方推送地址URL';

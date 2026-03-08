@@ -9,7 +9,8 @@ import com.luckyframe.rc.ReadTxt;
 import com.luckyframe.rc.Readfile;
 import com.luckyframe.rc.entity.ElementAction;
 import com.luckyframe.rc.entity.RcWebCaseSteps;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +29,10 @@ import java.util.List;
  * @Date 2021-11-05
  * @Version 2.0
  */
-@Slf4j
 @RestController
 @RequestMapping("/testmanagmt/RecordController")
 public class RecordController {
+    private static final Logger log = LoggerFactory.getLogger(RecordController.class);
 
     @Autowired
     private IProjectCaseStepsService projectCaseStepsService;

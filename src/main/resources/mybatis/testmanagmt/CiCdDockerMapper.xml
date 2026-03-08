@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testmanagmt.cicd.mapper.CiCdDockerMapper">
+    <resultMap type="com.luckyframe.project.testmanagmt.cicd.domain.CiCdDocker" id="CiCdDockerResult">
+        <id property="dockerId" column="docker_id" />
+        <result property="dockerName" column="docker_name" />
+        <result property="dockerUrl" column="docker_url" />
+        <result property="port" column="port" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="description" column="description" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectCiCdDockerVo">
+        select docker_id, docker_name, docker_url, port, username, password, description, status, create_by, create_time, update_by, update_time from ci_cd_docker
+    </sql>
+
+    <select id="selectCiCdDockerById" parameterType="Integer" resultMap="CiCdDockerResult">
+        <include refid="selectCiCdDockerVo" />
+        where docker_id = #{dockerId}
+    </select>
+
+    <select id="selectCiCdDockerList" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdDocker" resultMap="CiCdDockerResult">
+        <include refid="selectCiCdDockerVo" />
+        <where>
+            <if test="dockerName != null and dockerName != ''">
+                and docker_name like concat('%', #{dockerName}, '%')
+            </if>
+            <if test="dockerUrl != null and dockerUrl != ''">
+                and docker_url like concat('%', #{dockerUrl}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCiCdDocker" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdDocker" useGeneratedKeys="true" keyProperty="dockerId">
+        insert into ci_cd_docker
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dockerName != null and dockerName != ''">
+                docker_name,
+            </if>
+            <if test="dockerUrl != null and dockerUrl != ''">
+                docker_url,
+            </if>
+            <if test="port != null">
+                port,
+            </if>
+            <if test="username != null and username != ''">
+                username,
+            </if>
+            <if test="password != null and password != ''">
+                password,
+            </if>
+            <if test="description != null and description != ''">
+                description,
+            </if>
+            <if test="status != null and status != ''">
+                status,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dockerName != null and dockerName != ''">
+                #{dockerName},
+            </if>
+            <if test="dockerUrl != null and dockerUrl != ''">
+                #{dockerUrl},
+            </if>
+            <if test="port != null">
+                #{port},
+            </if>
+            <if test="username != null and username != ''">
+                #{username},
+            </if>
+            <if test="password != null and password != ''">
+                #{password},
+            </if>
+            <if test="description != null and description != ''">
+                #{description},
+            </if>
+            <if test="status != null and status != ''">
+                #{status},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateCiCdDocker" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdDocker">
+        update ci_cd_docker
+        <set>
+            <if test="dockerName != null and dockerName != ''">
+                docker_name = #{dockerName},
+            </if>
+            <if test="dockerUrl != null and dockerUrl != ''">
+                docker_url = #{dockerUrl},
+            </if>
+            <if test="port != null">
+                port = #{port},
+            </if>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where docker_id = #{dockerId}
+    </update>
+
+    <delete id="deleteCiCdDockerById" parameterType="Integer">
+        delete from ci_cd_docker where docker_id = #{dockerId}
+    </delete>
+
+    <delete id="deleteCiCdDockerByIds" parameterType="String">
+        delete from ci_cd_docker where docker_id in 
+        <foreach item="dockerId" collection="array" open="(" separator="," close=")">
+            #{dockerId}
+        </foreach>
+    </delete>
+</mapper>

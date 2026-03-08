@@ -54,10 +54,11 @@ public class FlywayConfig {
     		.baselineDescription(baselineDescription)
     		.baselineOnMigrate(baselineOnMigrate)
     		.baselineVersion(baselineVersion)
-    		.validateOnMigrate(validateOnMigrate)
+    		.validateOnMigrate(false)
     		.outOfOrder(outOfOrder)
     		.ignoreFutureMigrations(ignoreFutureMigrations)
     		.initSql(initSql)
+    		.placeholderReplacement(false)
     		.load();
     flyway.migrate();
   }

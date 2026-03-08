@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>添加GitLab配置</title>
+    <#include "../../../common/head.html">
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>添加GitLab配置</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link" href="${ctx}/testmanagmt/cicd/gitlab">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form class="form-horizontal m-t" id="addForm">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">项目：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="projectId" id="projectId" required>
+                                        <option value="">请选择项目</option>
+                                        <#list projects as project>
+                                            <option value="${project.projectId}">${project.projectName}</option>
+                                        </#list>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">GitLab名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="gitlabName" id="gitlabName" placeholder="请输入GitLab名称" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">GitLab URL：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="gitlabUrl" id="gitlabUrl" placeholder="请输入GitLab URL" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">项目路径：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="projectPath" id="projectPath" placeholder="请输入项目路径，格式：namespace/project" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">访问令牌：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="accessToken" id="accessToken" placeholder="请输入访问令牌" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">状态：</label>
+                                <div class="col-sm-8">
+                                    <div class="radio radio-inline">
+                                        <input type="radio" name="status" id="status1" value="1" checked>
+                                        <label for="status1">启用</label>
+                                    </div>
+                                    <div class="radio radio-inline">
+                                        <input type="radio" name="status" id="status0" value="0">
+                                        <label for="status0">禁用</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">描述：</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="请输入描述"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-3">
+                                    <button type="button" class="btn btn-primary" onclick="testConnection()">
+                                        <i class="fa fa-plug"></i> 测试连接
+                                    </button>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> 保存
+                                    </button>
+                                    <button type="button" class="btn btn-default" onclick="window.location.href='${ctx}/testmanagmt/cicd/gitlab'">
+                                        <i class="fa fa-undo"></i> 取消
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <#include "../../../common/foot.html">
+    <script type="text/javascript">
+        $(function() {
+            $('#addForm').validate({
+                submitHandler: function(form) {
+                    $.operate.save(form, ctx + "testmanagmt/cicd/gitlab/add");
+                }
+            });
+
+            // 项目选择变化时更新项目名称
+            $('#projectId').change(function() {
+                var projectId = $(this).val();
+                if (projectId) {
+                    var projectName = $(this).find('option:selected').text();
+                    $('input[name="projectName"]').val(projectName);
+                }
+            });
+        });
+
+        // 测试连接
+        function testConnection() {
+            var ciCdGitLab = {
+                projectId: $('#projectId').val(),
+                gitlabUrl: $('#gitlabUrl').val(),
+                projectPath: $('#projectPath').val(),
+                accessToken: $('#accessToken').val()
+            };
+
+            if (!ciCdGitLab.projectId) {
+                $.modal.alertWarning("请选择项目");
+                return;
+            }
+            if (!ciCdGitLab.gitlabUrl) {
+                $.modal.alertWarning("请输入GitLab URL");
+                return;
+            }
+            if (!ciCdGitLab.projectPath) {
+                $.modal.alertWarning("请输入项目路径");
+                return;
+            }
+            if (!ciCdGitLab.accessToken) {
+                $.modal.alertWarning("请输入访问令牌");
+                return;
+            }
+
+            $.ajax({
+                type: "post",
+                url: ctx + "testmanagmt/cicd/gitlab/testConnection",
+                data: ciCdGitLab,
+                success: function(result) {
+                    $.modal.alertSuccess(result.msg);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

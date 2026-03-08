@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testreport.defect.mapper.DefectManagementMapper">
+    <resultMap type="DefectManagement" id="DefectManagementResult">
+        <id property="defectId" column="defect_id" />
+        <result property="projectId" column="project_id" />
+        <result property="projectName" column="project_name" />
+        <result property="defectType" column="defect_type" />
+        <result property="defectSystemName" column="defect_system_name" />
+        <result property="defectSystemUrl" column="defect_system_url" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="apiToken" column="api_token" />
+        <result property="status" column="status" />
+        <result property="description" column="description" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectDefectManagementVo">
+        select defect_id, project_id, project_name, defect_type, defect_system_name, defect_system_url, username, password, api_token, status, description, create_time, update_time from project_defect_management
+    </sql>
+
+    <select id="selectDefectManagementById" parameterType="Long" resultMap="DefectManagementResult">
+        <include refid="selectDefectManagementVo" />
+        where defect_id = #{defectId}
+    </select>
+
+    <select id="selectDefectManagementList" parameterType="DefectManagement" resultMap="DefectManagementResult">
+        <include refid="selectDefectManagementVo" />
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="defectType != null">
+                and defect_type = #{defectType}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="defectSystemName != null and defectSystemName != ''">
+                and defect_system_name like concat('%', #{defectSystemName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertDefectManagement" parameterType="DefectManagement" useGeneratedKeys="true" keyProperty="defectId">
+        insert into project_defect_management
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="projectName != null">project_name,</if>
+            <if test="defectType != null">defect_type,</if>
+            <if test="defectSystemName != null">defect_system_name,</if>
+            <if test="defectSystemUrl != null">defect_system_url,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="apiToken != null">api_token,</if>
+            <if test="status != null">status,</if>
+            <if test="description != null">description,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="projectName != null">#{projectName},</if>
+            <if test="defectType != null">#{defectType},</if>
+            <if test="defectSystemName != null">#{defectSystemName},</if>
+            <if test="defectSystemUrl != null">#{defectSystemUrl},</if>
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="apiToken != null">#{apiToken},</if>
+            <if test="status != null">#{status},</if>
+            <if test="description != null">#{description},</if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateDefectManagement" parameterType="DefectManagement">
+        update project_defect_management
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="defectType != null">defect_type = #{defectType},</if>
+            <if test="defectSystemName != null">defect_system_name = #{defectSystemName},</if>
+            <if test="defectSystemUrl != null">defect_system_url = #{defectSystemUrl},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="apiToken != null">api_token = #{apiToken},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            update_time = now()
+        </set>
+        where defect_id = #{defectId}
+    </update>
+
+    <delete id="deleteDefectManagementById" parameterType="Long">
+        delete from project_defect_management where defect_id = #{defectId}
+    </delete>
+
+    <delete id="deleteDefectManagementByIds" parameterType="String">
+        delete from project_defect_management where defect_id in
+        <foreach item="defectId" collection="array" open="(" separator="," close=")">
+            #{defectId}
+        </foreach>
+    </delete>
+
+    <select id="selectDefectManagementByProjectId" parameterType="Long" resultMap="DefectManagementResult">
+        <include refid="selectDefectManagementVo" />
+        where project_id = #{projectId}
+    </select>
+
+    <select id="selectDefectManagementByDefectType" parameterType="Integer" resultMap="DefectManagementResult">
+        <include refid="selectDefectManagementVo" />
+        where defect_type = #{defectType}
+    </select>
+</mapper>

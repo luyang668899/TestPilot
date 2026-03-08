@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testreport.template.mapper.ReportTemplateMapper">
+    <resultMap type="com.luckyframe.project.testreport.template.domain.ReportTemplate" id="ReportTemplateResult">
+        <id property="templateId" column="template_id" />
+        <result property="templateName" column="template_name" />
+        <result property="templateType" column="template_type" />
+        <result property="templateContent" column="template_content" />
+        <result property="templateDesc" column="template_desc" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectReportTemplateVo">
+        select template_id, template_name, template_type, template_content, template_desc, status, create_by, create_time, update_by, update_time from report_template
+    </sql>
+
+    <select id="selectReportTemplateById" parameterType="Long" resultMap="ReportTemplateResult">
+        <include refid="selectReportTemplateVo" />
+        where template_id = #{templateId}
+    </select>
+
+    <select id="selectReportTemplateList" parameterType="com.luckyframe.project.testreport.template.domain.ReportTemplate" resultMap="ReportTemplateResult">
+        <include refid="selectReportTemplateVo" />
+        <where>
+            <if test="templateName != null and templateName != ''">
+                and template_name like concat('%', #{templateName}, '%')
+            </if>
+            <if test="templateType != null">
+                and template_type = #{templateType}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertReportTemplate" parameterType="com.luckyframe.project.testreport.template.domain.ReportTemplate">
+        insert into report_template (template_name, template_type, template_content, template_desc, status, create_by, create_time, update_by, update_time)
+        values (#{templateName}, #{templateType}, #{templateContent}, #{templateDesc}, #{status}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+    <update id="updateReportTemplate" parameterType="com.luckyframe.project.testreport.template.domain.ReportTemplate">
+        update report_template
+        <set>
+            <if test="templateName != null">
+                template_name = #{templateName},
+            </if>
+            <if test="templateType != null">
+                template_type = #{templateType},
+            </if>
+            <if test="templateContent != null">
+                template_content = #{templateContent},
+            </if>
+            <if test="templateDesc != null">
+                template_desc = #{templateDesc},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where template_id = #{templateId}
+    </update>
+
+    <delete id="deleteReportTemplateById" parameterType="Long">
+        delete from report_template where template_id = #{templateId}
+    </delete>
+
+    <delete id="deleteReportTemplateByIds" parameterType="String">
+        delete from report_template where template_id in
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </delete>
+
+    <select id="selectEnabledReportTemplates" resultMap="ReportTemplateResult">
+        <include refid="selectReportTemplateVo" />
+        where status = 1
+    </select>
+</mapper>

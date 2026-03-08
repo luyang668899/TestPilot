@@ -7,38 +7,40 @@
         <form class="form-horizontal m" id="form-projectCaseParams-edit" th:object="${projectCaseParams}">
             <input id="paramsId" name="paramsId" th:field="*{paramsId}"  type="hidden">
             <div class="form-group">	
-				<label class="col-sm-3 control-label">项目名称：</label>
-				<div class="col-sm-8">
-					<select id="projectId" name="projectId" th:field="*{projectId}" class="form-control m-b" th:with="type=${projects}" onchange="resetValidateForm()">
-	                    <option value="0">所有项目</option>
-	                    <option th:each="projects : ${type}" th:text="${projects.projectName}" th:value="${projects.projectId}" th:selected="${projects.projectId == projectCaseParams.projectId}"></option>
-	                </select>
-				</div>
+			<label class="col-sm-3 control-label">项目名称：</label>
+			<div class="col-sm-8">
+				<select id="projectId" name="projectId" th:field="*{projectId}" class="form-control m-b" th:with="type=${projects}" onchange="resetValidateForm()">
+		            <option value="0">所有项目</option>
+		            <option th:each="projects : ${type}" th:text="${projects.projectName}" th:value="${projects.projectId}" th:selected="${projects.projectId == projectCaseParams.projectId}"></option>
+		        </select>
 			</div>
-			<div class="form-group">
-				<label class="col-sm-3 control-label">环境：</label>
-				<div class="col-sm-8">
-					<input id="envName" name="envName" th:field="*{envName}" class="form-control" type="text">
-				</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">环境：</label>
+			<div class="col-sm-8">
+				<select id="environmentId" name="environmentId" th:field="*{environmentId}" class="form-control m-b" required>
+					<option th:each="env : ${environments}" th:value="${env.environmentId}" th:text="${env.environmentName}" th:selected="${env.environmentId == projectCaseParams.environmentId}"></option>
+				</select>
 			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">参数名称：</label>
-				<div class="col-sm-8">
-					<input id="paramsName" name="paramsName" th:field="*{paramsName}" class="form-control" type="text">
-				</div>
+		</div>
+		<div class="form-group">	
+			<label class="col-sm-3 control-label">参数名称：</label>
+			<div class="col-sm-8">
+				<input id="paramsName" name="paramsName" th:field="*{paramsName}" class="form-control" type="text">
 			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">参数值：</label>
-				<div class="col-sm-8">
-					<input id="paramsValue" name="paramsValue" th:field="*{paramsValue}" class="form-control" type="text">
-				</div>
+		</div>
+		<div class="form-group">	
+			<label class="col-sm-3 control-label">参数值：</label>
+			<div class="col-sm-8">
+				<input id="paramsValue" name="paramsValue" th:field="*{paramsValue}" class="form-control" type="text">
 			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">备注：</label>
-				<div class="col-sm-8">
-					<textarea id="remark" name="remark" th:field="*{remark}" class="form-control" rows="8"></textarea>
-				</div>
+		</div>
+		<div class="form-group">	
+			<label class="col-sm-3 control-label">备注：</label>
+			<div class="col-sm-8">
+				<textarea id="remark" name="remark" th:field="*{remark}" class="form-control" rows="8"></textarea>
 			</div>
+		</div>
 		</form>
     </div>
     <div th:include="include::footer"></div>
@@ -52,40 +54,78 @@
 			}
 		});
 		
+		$(function() {
+			// 加载环境列表
+			loadEnvironments();
+			
+			// 项目选择变化时加载环境列表
+			$('#projectId').change(function() {
+				loadEnvironments();
+				resetValidateForm();
+			});
+		});
+		
+		// 加载环境列表
+		function loadEnvironments() {
+			var projectId = $('#projectId').val();
+			if (projectId) {
+				$.ajax({
+					url: prefix + "/getEnvironmentsByProjectId/" + projectId,
+					type: "GET",
+					dataType: "json",
+					success: function(data) {
+						$('#environmentId').empty();
+						var currentEnvId = $('#environmentId').val();
+						var hasSelected = false;
+						for (var i = 0; i < data.length; i++) {
+							if (data[i].environmentId == currentEnvId) {
+								$('#environmentId').append('<option value="' + data[i].environmentId + '" selected>' + data[i].environmentName + '</option>');
+								hasSelected = true;
+							} else if (data[i].isDefault === 'Y' && !hasSelected) {
+								$('#environmentId').append('<option value="' + data[i].environmentId + '" selected>' + data[i].environmentName + '</option>');
+								hasSelected = true;
+							} else {
+								$('#environmentId').append('<option value="' + data[i].environmentId + '">' + data[i].environmentName + '</option>');
+							}
+						}
+					}
+				});
+			}
+		}
+		
 		$("#form-projectCaseParams-edit").validate({
 			rules:{
 				projectId:{
 					required:true,
 				},
-				envName:{
-					required:true,
-					maxlength:500
+				environmentId:{
+					required:true
 				},
 				paramsName:{
 					required:true,
-        			maxlength: 50,
-                    remote: {
-                        url: prefix + "/checkProjectCaseParamsNameUnique",
-                        type: "post",
-                        dataType: "json",
-                        data: {
+					maxlength: 50,
+					remote: {
+						url: prefix + "/checkProjectCaseParamsNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
 							paramsId: function () {
 								return $.common.trim($("#paramsId").val());
 							},
-                            name: function () {
-                                return $.common.trim($("#paramsName").val());
-                            },
-							envName: function () {
-								return $.common.trim($("#envName").val());
+							name: function () {
+								return $.common.trim($("#paramsName").val());
 							},
-                            projectId: function () {
-                                return $.common.trim($("#projectId").val());
-                            }
-                        },
-                        dataFilter: function (data, type) {
-                        	return $.validate.unique(data);
-                        }
-                    }
+							environmentId: function () {
+								return $.common.trim($("#environmentId").val());
+							},
+							projectId: function () {
+								return $.common.trim($("#projectId").val());
+							}
+						},
+						dataFilter: function (data, type) {
+							return $.validate.unique(data);
+						}
+					}
 				},
 				paramsValue:{
 					required:true,
@@ -95,11 +135,11 @@
 					maxlength:200
 				}
 			},
-        	messages: {
-                "paramsName": {
-                    remote: "参数名称已经存在"
-                }
-            }
+			messages: {
+				"paramsName": {
+					remote: "参数名称已经存在"
+				}
+			}
 		});
 		
 		/*重新初始化表单验证*/
@@ -109,10 +149,10 @@
 		}
 		
 		function submitHandler() {
-	        if ($.validate.form()) {
-	            $.operate.save(prefix + "/edit", $('#form-projectCaseParams-edit').serialize());
-	        }
-	    }
+		    if ($.validate.form()) {
+		        $.operate.save(prefix + "/edit", $('#form-projectCaseParams-edit').serialize());
+		    }
+		}
 	</script>
 </body>
 </html>

@@ -2,8 +2,6 @@ package com.luckyframe.project.testmanagmt.projectCaseParams.controller;
 
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +26,8 @@ import com.luckyframe.project.system.project.domain.Project;
 import com.luckyframe.project.system.project.service.IProjectService;
 import com.luckyframe.project.testmanagmt.projectCaseParams.domain.ProjectCaseParams;
 import com.luckyframe.project.testmanagmt.projectCaseParams.service.IProjectCaseParamsService;
+import com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment;
+import com.luckyframe.project.testmanagmt.projectEnvironment.service.IProjectEnvironmentService;
 
 /**
  * 用例公共参数 信息操作处理
@@ -44,6 +44,9 @@ public class ProjectCaseParamsController extends BaseController
 	
 	@Autowired
 	private IProjectService projectService;
+	
+	@Autowired
+	private IProjectEnvironmentService projectEnvironmentService;
 	
 	@RequiresPermissions("testmanagmt:projectCaseParams:view")
 	@GetMapping()
@@ -94,6 +97,8 @@ public class ProjectCaseParamsController extends BaseController
         mmap.put("projects", projects);
         if(StringUtils.isNotEmpty(ShiroUtils.getProjectId())){
         	mmap.put("defaultProjectId", ShiroUtils.getProjectId());
+        	List<ProjectEnvironment> environments = projectEnvironmentService.selectProjectEnvironmentByProjectId(Integer.valueOf(ShiroUtils.getProjectId()));
+        	mmap.put("environments", environments);
         }
 	    return "testmanagmt/projectCaseParams/add";
 	}
@@ -106,10 +111,10 @@ public class ProjectCaseParamsController extends BaseController
 	@PostMapping("/add")
 	@ResponseBody
 	public AjaxResult addSave(ProjectCaseParams projectCaseParams)
-	{		
+	{
 		if(!PermissionUtils.isProjectPermsPassByProjectId(projectCaseParams.getProjectId())){
 			return error("没有此项目保存用例参数权限");
-		}		
+		}
 		return toAjax(projectCaseParamsService.insertProjectCaseParams(projectCaseParams));
 	}
 
@@ -123,6 +128,8 @@ public class ProjectCaseParamsController extends BaseController
         mmap.put("projects", projects);
 		ProjectCaseParams projectCaseParams = projectCaseParamsService.selectProjectCaseParamsById(paramsId);
 		mmap.put("projectCaseParams", projectCaseParams);
+		List<ProjectEnvironment> environments = projectEnvironmentService.selectProjectEnvironmentByProjectId(projectCaseParams.getProjectId());
+		mmap.put("environments", environments);
 	    return "testmanagmt/projectCaseParams/edit";
 	}
 	
@@ -134,7 +141,7 @@ public class ProjectCaseParamsController extends BaseController
 	@PostMapping("/edit")
 	@ResponseBody
 	public AjaxResult editSave(ProjectCaseParams projectCaseParams)
-	{		
+	{
 		if(!PermissionUtils.isProjectPermsPassByProjectId(projectCaseParams.getProjectId())){
 			return error("没有此项目修改用例参数权限");
 		}
@@ -149,14 +156,14 @@ public class ProjectCaseParamsController extends BaseController
 	@PostMapping( "/remove")
 	@ResponseBody
 	public AjaxResult remove(String ids)
-	{		
-        try
-        {
-        	return toAjax(projectCaseParamsService.deleteProjectCaseParamsByIds(ids));
-        }catch (BusinessException e)
-        {
-            return error(e.getMessage());
-        }		
+	{
+		try
+		{
+			return toAjax(projectCaseParamsService.deleteProjectCaseParamsByIds(ids));
+		}catch (BusinessException e)
+		{
+			return error(e.getMessage());
+		}
 	}
 	
     /**
@@ -178,16 +185,11 @@ public class ProjectCaseParamsController extends BaseController
 	 * @author Seagull
 	 * @date 2019年3月26日
 	 */
-	@GetMapping("/getProjectEnvListByProjectId/{projectId}")
+	@GetMapping("/getEnvironmentsByProjectId/{projectId}")
 	@ResponseBody
-	public String getProjectEnvListByProjectId(@PathVariable("projectId") Integer projectId)
+	public List<ProjectEnvironment> getEnvironmentsByProjectId(@PathVariable("projectId") Integer projectId)
 	{
-		List<String> envList = projectCaseParamsService.selectProjectEnvListByProjectId(projectId);
-		if(envList.size()==0){
-			envList.add("默认环境");
-		}
-		JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(envList));
-		return jsonArray.toJSONString();
+		return projectEnvironmentService.selectProjectEnvironmentByProjectId(projectId);
 	}
 	
 }

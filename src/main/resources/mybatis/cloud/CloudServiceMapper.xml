@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.cloud.mapper.CloudServiceMapper">
+    <resultMap type="com.luckyframe.project.cloud.domain.CloudService" id="CloudServiceResult">
+        <id property="cloudId" column="cloud_id" />
+        <result property="cloudName" column="cloud_name" />
+        <result property="cloudType" column="cloud_type" />
+        <result property="accessKey" column="access_key" />
+        <result property="secretKey" column="secret_key" />
+        <result property="region" column="region" />
+        <result property="description" column="description" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectCloudServiceVo">
+        select cloud_id, cloud_name, cloud_type, access_key, secret_key, region, description, status, create_by, create_time, update_by, update_time from cloud_service
+    </sql>
+
+    <select id="selectCloudServiceById" parameterType="Integer" resultMap="CloudServiceResult">
+        <include refid="selectCloudServiceVo" />
+        where cloud_id = #{cloudId}
+    </select>
+
+    <select id="selectCloudServiceList" parameterType="com.luckyframe.project.cloud.domain.CloudService" resultMap="CloudServiceResult">
+        <include refid="selectCloudServiceVo" />
+        <where>
+            <if test="cloudName != null and cloudName != ''">
+                and cloud_name like concat('%', #{cloudName}, '%')
+            </if>
+            <if test="cloudType != null and cloudType != ''">
+                and cloud_type = #{cloudType}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCloudService" parameterType="com.luckyframe.project.cloud.domain.CloudService" useGeneratedKeys="true" keyProperty="cloudId">
+        insert into cloud_service
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cloudName != null and cloudName != ''">
+                cloud_name,
+            </if>
+            <if test="cloudType != null and cloudType != ''">
+                cloud_type,
+            </if>
+            <if test="accessKey != null and accessKey != ''">
+                access_key,
+            </if>
+            <if test="secretKey != null and secretKey != ''">
+                secret_key,
+            </if>
+            <if test="region != null and region != ''">
+                region,
+            </if>
+            <if test="description != null and description != ''">
+                description,
+            </if>
+            <if test="status != null and status != ''">
+                status,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cloudName != null and cloudName != ''">
+                #{cloudName},
+            </if>
+            <if test="cloudType != null and cloudType != ''">
+                #{cloudType},
+            </if>
+            <if test="accessKey != null and accessKey != ''">
+                #{accessKey},
+            </if>
+            <if test="secretKey != null and secretKey != ''">
+                #{secretKey},
+            </if>
+            <if test="region != null and region != ''">
+                #{region},
+            </if>
+            <if test="description != null and description != ''">
+                #{description},
+            </if>
+            <if test="status != null and status != ''">
+                #{status},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateCloudService" parameterType="com.luckyframe.project.cloud.domain.CloudService">
+        update cloud_service
+        <set>
+            <if test="cloudName != null and cloudName != ''">
+                cloud_name = #{cloudName},
+            </if>
+            <if test="cloudType != null and cloudType != ''">
+                cloud_type = #{cloudType},
+            </if>
+            <if test="accessKey != null and accessKey != ''">
+                access_key = #{accessKey},
+            </if>
+            <if test="secretKey != null and secretKey != ''">
+                secret_key = #{secretKey},
+            </if>
+            <if test="region != null and region != ''">
+                region = #{region},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where cloud_id = #{cloudId}
+    </update>
+
+    <delete id="deleteCloudServiceById" parameterType="Integer">
+        delete from cloud_service where cloud_id = #{cloudId}
+    </delete>
+
+    <delete id="deleteCloudServiceByIds" parameterType="String">
+        delete from cloud_service where cloud_id in 
+        <foreach item="cloudId" collection="array" open="(" separator="," close=")">
+            #{cloudId}
+        </foreach>
+    </delete>
+</mapper>

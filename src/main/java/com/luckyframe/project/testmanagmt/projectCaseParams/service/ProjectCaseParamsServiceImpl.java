@@ -66,28 +66,44 @@ public class ProjectCaseParamsServiceImpl implements IProjectCaseParamsService
 	/**
 	 * 根据项目ID和环境查询所有项目中以及当前项目下的公共参数
 	 * @param projectId 项目ID
-	 * @param envName 环境
+	 * @param environmentId 环境ID
 	 * @author jerelli
 	 * @date 2020年6月18日
 	 */
 	@Override
-	public List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvName(Integer projectId,String envName)
+	public List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvironmentId(Integer projectId, Integer environmentId)
 	{
-		return projectCaseParamsMapper.selectProjectCaseParamsListByProjectIdAndEnvName(projectId,envName);
+		return projectCaseParamsMapper.selectProjectCaseParamsListByProjectIdAndEnvironmentId(projectId, environmentId);
 	}
 
 	/**
-	 * 根据项目ID查询当前项目下的环境
+	 * 根据项目ID和环境名称查询所有项目中以及当前项目下的公共参数
 	 * @param projectId 项目ID
-	 * @return
+	 * @param envName 环境名称
+	 * @author jerelli
+	 * @date 2020年6月18日
+	 */
+	@Override
+	public List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvName(Integer projectId, String envName)
+	{
+		// 这里需要通过环境名称查询环境ID，然后调用现有的方法
+		// 暂时返回空列表，后续需要实现环境名称到环境ID的转换
+		return projectCaseParamsMapper.selectProjectCaseParamsListByProjectId(projectId);
+	}
+
+	/**
+	 * 根据项目ID查询该项目下所有的环境
+	 * @param projectId 项目ID
+	 * @return 环境列表
 	 * @author jerelli
 	 * @date 2020年6月18日
 	 */
 	@Override
 	public List<String> selectProjectEnvListByProjectId(Integer projectId) {
-		return projectCaseParamsMapper.selectProjectEnvListByProjectId(projectId);
+		// 这里需要查询环境管理表获取环境列表
+		// 暂时返回空列表，后续需要实现从环境管理表获取数据
+		return java.util.Collections.emptyList();
 	}
-
 
 	/**
      * 新增用例公共参数
@@ -136,9 +152,9 @@ public class ProjectCaseParamsServiceImpl implements IProjectCaseParamsService
 			Integer paramsId=Integer.valueOf(paramsIdstr);
 			ProjectCaseParams projectCaseParams  = projectCaseParamsMapper.selectProjectCaseParamsById(paramsId);
 			
-			if(!PermissionUtils.isProjectPermsPassByProjectId(projectCaseParams.getProjectId())){	
-				  throw new BusinessException(String.format("用例参数【%1$s】没有项目删除权限", projectCaseParams.getParamsName()));
-			}			
+			if(!PermissionUtils.isProjectPermsPassByProjectId(projectCaseParams.getProjectId())){
+			  throw new BusinessException(String.format("用例参数【%1$s】没有项目删除权限", projectCaseParams.getParamsName()));
+			}
 		}
 
 		

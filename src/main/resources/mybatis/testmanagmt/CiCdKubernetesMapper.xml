@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testmanagmt.cicd.mapper.CiCdKubernetesMapper">
+    <resultMap type="com.luckyframe.project.testmanagmt.cicd.domain.CiCdKubernetes" id="CiCdKubernetesResult">
+        <id property="kubernetesId" column="kubernetes_id" />
+        <result property="kubernetesName" column="kubernetes_name" />
+        <result property="clusterUrl" column="cluster_url" />
+        <result property="namespace" column="namespace" />
+        <result property="authType" column="auth_type" />
+        <result property="kubeconfigPath" column="kubeconfig_path" />
+        <result property="description" column="description" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectCiCdKubernetesVo">
+        select kubernetes_id, kubernetes_name, cluster_url, namespace, auth_type, kubeconfig_path, description, status, create_by, create_time, update_by, update_time from ci_cd_kubernetes
+    </sql>
+
+    <select id="selectCiCdKubernetesById" parameterType="Integer" resultMap="CiCdKubernetesResult">
+        <include refid="selectCiCdKubernetesVo" />
+        where kubernetes_id = #{kubernetesId}
+    </select>
+
+    <select id="selectCiCdKubernetesList" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdKubernetes" resultMap="CiCdKubernetesResult">
+        <include refid="selectCiCdKubernetesVo" />
+        <where>
+            <if test="kubernetesName != null and kubernetesName != ''">
+                and kubernetes_name like concat('%', #{kubernetesName}, '%')
+            </if>
+            <if test="clusterUrl != null and clusterUrl != ''">
+                and cluster_url like concat('%', #{clusterUrl}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCiCdKubernetes" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdKubernetes" useGeneratedKeys="true" keyProperty="kubernetesId">
+        insert into ci_cd_kubernetes
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="kubernetesName != null and kubernetesName != ''">
+                kubernetes_name,
+            </if>
+            <if test="clusterUrl != null and clusterUrl != ''">
+                cluster_url,
+            </if>
+            <if test="namespace != null and namespace != ''">
+                namespace,
+            </if>
+            <if test="authType != null and authType != ''">
+                auth_type,
+            </if>
+            <if test="kubeconfigPath != null and kubeconfigPath != ''">
+                kubeconfig_path,
+            </if>
+            <if test="description != null and description != ''">
+                description,
+            </if>
+            <if test="status != null and status != ''">
+                status,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="kubernetesName != null and kubernetesName != ''">
+                #{kubernetesName},
+            </if>
+            <if test="clusterUrl != null and clusterUrl != ''">
+                #{clusterUrl},
+            </if>
+            <if test="namespace != null and namespace != ''">
+                #{namespace},
+            </if>
+            <if test="authType != null and authType != ''">
+                #{authType},
+            </if>
+            <if test="kubeconfigPath != null and kubeconfigPath != ''">
+                #{kubeconfigPath},
+            </if>
+            <if test="description != null and description != ''">
+                #{description},
+            </if>
+            <if test="status != null and status != ''">
+                #{status},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateCiCdKubernetes" parameterType="com.luckyframe.project.testmanagmt.cicd.domain.CiCdKubernetes">
+        update ci_cd_kubernetes
+        <set>
+            <if test="kubernetesName != null and kubernetesName != ''">
+                kubernetes_name = #{kubernetesName},
+            </if>
+            <if test="clusterUrl != null and clusterUrl != ''">
+                cluster_url = #{clusterUrl},
+            </if>
+            <if test="namespace != null and namespace != ''">
+                namespace = #{namespace},
+            </if>
+            <if test="authType != null and authType != ''">
+                auth_type = #{authType},
+            </if>
+            <if test="kubeconfigPath != null and kubeconfigPath != ''">
+                kubeconfig_path = #{kubeconfigPath},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where kubernetes_id = #{kubernetesId}
+    </update>
+
+    <delete id="deleteCiCdKubernetesById" parameterType="Integer">
+        delete from ci_cd_kubernetes where kubernetes_id = #{kubernetesId}
+    </delete>
+
+    <delete id="deleteCiCdKubernetesByIds" parameterType="String">
+        delete from ci_cd_kubernetes where kubernetes_id in 
+        <foreach item="kubernetesId" collection="array" open="(" separator="," close=")">
+            #{kubernetesId}
+        </foreach>
+    </delete>
+</mapper>

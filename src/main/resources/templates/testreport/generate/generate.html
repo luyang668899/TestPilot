@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告生成</title>
+    <link rel="stylesheet" href="../../../static/css/common.css">
+    <link rel="stylesheet" href="../../../static/css/table.css">
+    <script src="../../../static/js/jquery.min.js"></script>
+    <script src="../../../static/js/layui/layui.js"></script>
+    <script src="../../../static/js/common.js"></script>
+</head>
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <h3>测试报告生成</h3>
+                    </div>
+                    <div class="layui-card-body">
+                        <form class="layui-form" id="generateForm">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">任务ID</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="taskId" required lay-verify="required" placeholder="请输入任务ID" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">报告模板</label>
+                                <div class="layui-input-inline">
+                                    <select name="templateId" required lay-verify="required" class="layui-select" id="templateSelect">
+                                        <option value="">请选择模板</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="layui-btn layui-btn-primary">生成报告</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="reportContent" style="margin-top: 20px; display: none;">
+                            <h4>测试报告</h4>
+                            <div class="layui-card" style="margin-top: 10px;">
+                                <div class="layui-card-body" id="reportHtml"></div>
+                            </div>
+                            <div class="text-right" style="margin-top: 10px;">
+                                <button class="layui-btn layui-btn-primary" id="downloadBtn">下载报告</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        layui.use(['form', 'layer'], function() {
+            var form = layui.form;
+            var layer = layui.layer;
+
+            // 加载模板列表
+            function loadTemplates() {
+                $.ajax({
+                    url: '/testreport/template/enabled',
+                    type: 'GET',
+                    success: function(res) {
+                        if (res.code == 0) {
+                            var templates = res.data;
+                            var select = $('#templateSelect');
+                            select.html('<option value="">请选择模板</option>');
+                            for (var i = 0; i < templates.length; i++) {
+                                select.append('<option value="' + templates[i].templateId + '">' + templates[i].templateName + '</option>');
+                            }
+                            form.render('select');
+                        } else {
+                            layer.msg('加载模板失败：' + res.msg);
+                        }
+                    }
+                });
+            }
+
+            // 页面加载时加载模板列表
+            loadTemplates();
+
+            // 生成报告
+            form.on('submit(generateForm)', function(data) {
+                layer.load(2);
+                $.ajax({
+                    url: '/testreport/template/generate',
+                    type: 'POST',
+                    data: data.field,
+                    success: function(res) {
+                        layer.closeAll('loading');
+                        if (res.code == 0) {
+                            $('#reportHtml').html(res.data);
+                            $('#reportContent').show();
+                        } else {
+                            layer.msg('生成报告失败：' + res.msg);
+                        }
+                    },
+                    error: function() {
+                        layer.closeAll('loading');
+                        layer.msg('生成报告失败');
+                    }
+                });
+                return false;
+            });
+
+            // 下载报告
+            $('#downloadBtn').click(function() {
+                var taskId = $('input[name="taskId"]').val();
+                var templateId = $('select[name="templateId"]').val();
+                if (!taskId || !templateId) {
+                    layer.msg('请输入任务ID和选择模板');
+                    return;
+                }
+
+                // 生成报告文件并下载
+                var reportContent = $('#reportHtml').html();
+                var blob = new Blob([reportContent], {type: 'text/html'});
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = '测试报告_' + taskId + '.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告模板管理</title>
+    <link rel="stylesheet" href="../../../static/css/common.css">
+    <link rel="stylesheet" href="../../../static/css/table.css">
+    <script src="../../../static/js/jquery.min.js"></script>
+    <script src="../../../static/js/layui/layui.js"></script>
+    <script src="../../../static/js/common.js"></script>
+</head>
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <div class="layui-row">
+                            <div class="layui-col-md6">
+                                <h3>测试报告模板管理</h3>
+                            </div>
+                            <div class="layui-col-md6 text-right">
+                                <button class="layui-btn layui-btn-primary" id="addBtn">添加模板</button>
+                                <button class="layui-btn layui-btn-primary" id="exportBtn">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <form class="layui-form" id="searchForm">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">模板名称</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="templateName" placeholder="请输入模板名称" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">模板类型</label>
+                                    <div class="layui-input-inline">
+                                        <select name="templateType" class="layui-select">
+                                            <option value="">全部</option>
+                                            <option value="1">系统模板</option>
+                                            <option value="2">自定义模板</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">状态</label>
+                                    <div class="layui-input-inline">
+                                        <select name="status" class="layui-select">
+                                            <option value="">全部</option>
+                                            <option value="1">启用</option>
+                                            <option value="0">禁用</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-inline">
+                                    <button type="submit" class="layui-btn layui-btn-primary">查询</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="layui-table" id="templateTable" lay-filter="templateTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑模板弹窗 -->
+    <div id="templateDialog" style="display: none;">
+        <form class="layui-form" id="templateForm">
+            <input type="hidden" name="templateId">
+            <div class="layui-form-item">
+                <label class="layui-form-label">模板名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="templateName" required lay-verify="required" placeholder="请输入模板名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">模板类型</label>
+                <div class="layui-input-block">
+                    <select name="templateType" required lay-verify="required" class="layui-select">
+                        <option value="1">系统模板</option>
+                        <option value="2">自定义模板</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <select name="status" required lay-verify="required" class="layui-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">模板描述</label>
+                <div class="layui-input-block">
+                    <textarea name="templateDesc" placeholder="请输入模板描述" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">模板内容</label>
+                <div class="layui-input-block">
+                    <textarea name="templateContent" required lay-verify="required" placeholder="请输入模板内容，支持变量：${taskName}、${taskStatus}、${caseTotalCount}、${caseSuccCount}、${caseFailCount}、${caseLockCount}、${caseNoexecCount}、${successRate}、${createTime}、${finishTime}、${caseDetails}" class="layui-textarea" style="height: 300px;"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item text-center">
+                <button type="submit" class="layui-btn layui-btn-primary">保存</button>
+                <button type="button" class="layui-btn layui-btn-primary" id="cancelBtn">取消</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        layui.use(['table', 'layer', 'form'], function() {
+            var table = layui.table;
+            var layer = layui.layer;
+            var form = layui.form;
+
+            // 渲染表格
+            var tableIns = table.render({
+                elem: '#templateTable',
+                url: '/testreport/template/list',
+                method: 'get',
+                cols: [[
+                    {type: 'checkbox', fixed: 'left'},
+                    {field: 'templateId', title: '模板ID', width: 100},
+                    {field: 'templateName', title: '模板名称', width: 200},
+                    {field: 'templateType', title: '模板类型', width: 120, templet: function(d) {
+                        return d.templateType == 1 ? '系统模板' : '自定义模板';
+                    }},
+                    {field: 'status', title: '状态', width: 100, templet: function(d) {
+                        return d.status == 1 ? '启用' : '禁用';
+                    }},
+                    {field: 'templateDesc', title: '模板描述', minWidth: 200},
+                    {field: 'createBy', title: '创建者', width: 120},
+                    {field: 'createTime', title: '创建时间', width: 180},
+                    {field: 'updateBy', title: '更新者', width: 120},
+                    {field: 'updateTime', title: '更新时间', width: 180},
+                    {title: '操作', width: 200, fixed: 'right', templet: function(d) {
+                        var html = '';
+                        html += '<button class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>';
+                        html += '<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</button>';
+                        return html;
+                    }}
+                ]],
+                page: true,
+                limit: 10,
+                limits: [10, 20, 30, 40, 50],
+                done: function(res, curr, count) {
+                    // 表格渲染完成后的回调
+                }
+            });
+
+            // 搜索表单提交
+            form.on('submit(searchForm)', function(data) {
+                tableIns.reload({
+                    where: data.field,
+                    page: {curr: 1}
+                });
+                return false;
+            });
+
+            // 添加模板
+            $('#addBtn').click(function() {
+                form.val('templateForm', {});
+                layer.open({
+                    type: 1,
+                    title: '添加模板',
+                    content: $('#templateDialog'),
+                    area: ['800px', '600px'],
+                    success: function(layero, index) {
+                        // 弹窗打开后的回调
+                    }
+                });
+            });
+
+            // 编辑模板
+            table.on('tool(templateTable)', function(obj) {
+                var data = obj.data;
+                if (obj.event == 'edit') {
+                    form.val('templateForm', data);
+                    layer.open({
+                        type: 1,
+                        title: '编辑模板',
+                        content: $('#templateDialog'),
+                        area: ['800px', '600px'],
+                        success: function(layero, index) {
+                            // 弹窗打开后的回调
+                        }
+                    });
+                } else if (obj.event == 'delete') {
+                    layer.confirm('确定要删除该模板吗？', function(index) {
+                        $.ajax({
+                            url: '/testreport/template/' + data.templateId,
+                            type: 'DELETE',
+                            success: function(res) {
+                                if (res.code == 0) {
+                                    layer.msg('删除成功');
+                                    tableIns.reload();
+                                } else {
+                                    layer.msg('删除失败：' + res.msg);
+                                }
+                            }
+                        });
+                        layer.close(index);
+                    });
+                }
+            });
+
+            // 保存模板
+            form.on('submit(templateForm)', function(data) {
+                var url = data.field.templateId ? '/testreport/template' : '/testreport/template';
+                var type = data.field.templateId ? 'PUT' : 'POST';
+                $.ajax({
+                    url: url,
+                    type: type,
+                    contentType: 'application/json',
+                    data: JSON.stringify(data.field),
+                    success: function(res) {
+                        if (res.code == 0) {
+                            layer.msg('保存成功');
+                            layer.closeAll();
+                            tableIns.reload();
+                        } else {
+                            layer.msg('保存失败：' + res.msg);
+                        }
+                    }
+                });
+                return false;
+            });
+
+            // 取消按钮
+            $('#cancelBtn').click(function() {
+                layer.closeAll();
+            });
+
+            // 导出
+            $('#exportBtn').click(function() {
+                var form = $('#searchForm');
+                var url = '/testreport/template/export?' + form.serialize();
+                window.location.href = url;
+            });
+        });
+    </script>
+</body>
+</html>

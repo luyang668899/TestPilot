@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增测试数据</title>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>新增测试数据</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form class="form-horizontal m-t" id="form-testData-add">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">项目名称：</label>
+                                <div class="col-sm-8">
+                                    <select id="projectId" name="projectId" class="form-control">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">环境名称：</label>
+                                <div class="col-sm-8">
+                                    <select id="environmentId" name="environmentId" class="form-control">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">数据名称：</label>
+                                <div class="col-sm-8">
+                                    <input id="dataName" name="dataName" type="text" class="form-control" placeholder="请输入数据名称">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">数据类型：</label>
+                                <div class="col-sm-8">
+                                    <select id="dataType" name="dataType" class="form-control">
+                                        <option value="">请选择</option>
+                                        <option value="string">字符串</option>
+                                        <option value="number">数字</option>
+                                        <option value="boolean">布尔值</option>
+                                        <option value="email">邮箱</option>
+                                        <option value="phone">手机号</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">数据值：</label>
+                                <div class="col-sm-8">
+                                    <input id="dataValue" name="dataValue" type="text" class="form-control" placeholder="请输入数据值">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">描述：</label>
+                                <div class="col-sm-8">
+                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="请输入描述"></textarea>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-3">
+                                    <button class="btn btn-primary" type="submit">提交</button>
+                                    <button class="btn btn-default" type="button" onclick="window.history.back();">取消</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: validate-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "testmanagmt/testData";
+        
+        $(function() {
+            loadProjects();
+            validateRule();
+        });
+        
+        function loadProjects() {
+            $.ajax({
+                url: prefix + "/projects",
+                type: 'get',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 0) {
+                        var projects = data.data;
+                        var projectSelect = $('#projectId');
+                        projectSelect.empty().append('<option value="">请选择</option>');
+                        $.each(projects, function(index, project) {
+                            projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+                        });
+                    }
+                }
+            });
+        }
+        
+        $('#projectId').change(function() {
+            var projectId = $(this).val();
+            if (projectId) {
+                loadEnvironments(projectId);
+            } else {
+                $('#environmentId').empty().append('<option value="">请选择</option>');
+            }
+        });
+        
+        function loadEnvironments(projectId) {
+            $.ajax({
+                url: prefix + "/environments",
+                type: 'get',
+                data: { projectId: projectId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 0) {
+                        var environments = data.data;
+                        var environmentSelect = $('#environmentId');
+                        environmentSelect.empty().append('<option value="">请选择</option>');
+                        $.each(environments, function(index, environment) {
+                            environmentSelect.append('<option value="' + environment.environmentId + '">' + environment.environmentName + '</option>');
+                        });
+                    }
+                }
+            });
+        }
+        
+        function validateRule() {
+            var icon = "<i class='fa fa-times-circle'></i> ";
+            $("#form-testData-add").validate({
+                rules: {
+                    projectId: {
+                        required: true
+                    },
+                    environmentId: {
+                        required: true
+                    },
+                    dataName: {
+                        required: true
+                    },
+                    dataType: {
+                        required: true
+                    },
+                    dataValue: {
+                        required: true
+                    }
+                },
+                messages: {
+                    projectId: {
+                        required: icon + "请选择项目"
+                    },
+                    environmentId: {
+                        required: icon + "请选择环境"
+                    },
+                    dataName: {
+                        required: icon + "请输入数据名称"
+                    },
+                    dataType: {
+                        required: icon + "请选择数据类型"
+                    },
+                    dataValue: {
+                        required: icon + "请输入数据值"
+                    }
+                },
+                submitHandler: function(form) {
+                    $.operate.save(prefix + "/add", $('#form-testData-add').serialize());
+                }
+            });
+        }
+    </script>
+</body>
+</html>

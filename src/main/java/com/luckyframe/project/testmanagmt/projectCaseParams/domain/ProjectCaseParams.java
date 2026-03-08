@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.luckyframe.framework.web.domain.BaseEntity;
 import com.luckyframe.project.system.project.domain.Project;
+import com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment;
 
 import java.util.Date;
 
@@ -19,8 +20,8 @@ public class ProjectCaseParams extends BaseEntity
 	
 	/** 用例参数ID */
 	private Integer paramsId;
-	/** 环境 */
-	private String envName;
+	/** 环境ID */
+	private Integer environmentId;
 	/** 参数名称 */
 	private String paramsName;
 	/** 参数值 */
@@ -39,6 +40,8 @@ public class ProjectCaseParams extends BaseEntity
 	private String remark;
 	/** 关联项目实体 */
 	private Project project;
+	/** 关联环境实体 */
+	private ProjectEnvironment environment;
 
 	public Project getProject() {
 		return project;
@@ -46,6 +49,14 @@ public class ProjectCaseParams extends BaseEntity
 
 	public void setProject(Project project) {
 		this.project = project;
+	}
+
+	public ProjectEnvironment getEnvironment() {
+		return environment;
+	}
+
+	public void setEnvironment(ProjectEnvironment environment) {
+		this.environment = environment;
 	}
 
 	public void setParamsId(Integer paramsId) 
@@ -57,12 +68,12 @@ public class ProjectCaseParams extends BaseEntity
 	{
 		return paramsId;
 	}
-	public String getEnvName() {
-		return envName;
+	public Integer getEnvironmentId() {
+		return environmentId;
 	}
 
-	public void setEnvName(String envName) {
-		this.envName = envName;
+	public void setEnvironmentId(Integer environmentId) {
+		this.environmentId = environmentId;
 	}
 	public void setParamsName(String paramsName) 
 	{
@@ -140,7 +151,7 @@ public class ProjectCaseParams extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("paramsId", getParamsId())
-			.append("envName", getEnvName())
+			.append("environmentId", getEnvironmentId())
             .append("paramsName", getParamsName())
             .append("paramsValue", getParamsValue())
             .append("projectId", getProjectId())

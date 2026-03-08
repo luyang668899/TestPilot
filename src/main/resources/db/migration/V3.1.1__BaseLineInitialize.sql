@@ -821,6 +821,9 @@ insert ignore into sys_dict_data values(27, 1,  'HTTP接口', '0',  'testmanagmt
 insert ignore into sys_dict_data values(28, 2,  'Web UI', '1',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', 'Web UI');
 insert ignore into sys_dict_data values(29, 3,  'API驱动', '2',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', 'API驱动');
 insert ignore into sys_dict_data values(30, 4,  '移动端', '3',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '移动端');
+insert ignore into sys_dict_data values(31, 5,  '性能测试', '4',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '性能测试');
+insert ignore into sys_dict_data values(32, 6,  '安全测试', '5',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '安全测试');
+insert ignore into sys_dict_data values(33, 7,  'IoT设备测试', '6',  'testmanagmt_case_type',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', 'IoT设备测试');
 insert ignore into sys_dict_data values(31, 1,  '中断', '0',  'testmanagmt_case_stepfailcontinue',   '',   'info',  'Y', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '后续步骤中断');
 insert ignore into sys_dict_data values(32, 2,  '继续', '1',  'testmanagmt_case_stepfailcontinue',   '',   'info',  'N', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '后续步骤继续');
 insert ignore into sys_dict_data values(33, 1,  'String', '0',  'testmanagmt_templateparams_type',   '',   'info',  'Y', '0', 'admin', '2019-02-13 10-27-32', 'luckyframe', '2019-02-13 10-27-32', '模板参数类型 String');

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>新增插件</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <form class="form-horizontal m-t" id="formAdd">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">插件名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="pluginName" placeholder="请输入插件名称" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">插件类型：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control m-b" name="pluginType" required>
+                                        <option value="测试驱动插件">测试驱动插件</option>
+                                        <option value="接口测试插件">接口测试插件</option>
+                                        <option value="UI测试插件">UI测试插件</option>
+                                        <option value="监控和通知插件">监控和通知插件</option>
+                                        <option value="工具和辅助插件">工具和辅助插件</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">插件版本：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="pluginVersion" placeholder="请输入插件版本，例如：1.0.0" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">插件路径：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="pluginPath" placeholder="请输入插件路径" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control m-b" name="status" required>
+                                        <option value="启用">启用</option>
+                                        <option value="禁用">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">描述：</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" placeholder="请输入插件描述" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-3">
+                                    <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> 保存</button>
+                                    <button class="btn btn-white" type="button" onclick="closeModal()"><i class="fa fa-times"></i> 取消</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "plugin";
+
+        $(function() {
+            $('#formAdd').validate({
+                rules: {
+                    pluginName: {
+                        required: true,
+                        maxlength: 50
+                    },
+                    pluginType: {
+                        required: true
+                    },
+                    pluginVersion: {
+                        required: true,
+                        maxlength: 20
+                    },
+                    pluginPath: {
+                        required: true,
+                        maxlength: 200
+                    }
+                },
+                submitHandler: function(form) {
+                    $.ajax({
+                        type: "post",
+                        url: prefix + "/add",
+                        data: $(form).serialize(),
+                        success: function(data) {
+                            if (data.code == 0) {
+                                parent.layer.msg(data.msg, {icon: 1});
+                                parent.reLoad();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            } else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        function closeModal() {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        }
+    </script>
+</body>
+</html>

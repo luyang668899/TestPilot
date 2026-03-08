@@ -14,6 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="timeout"    column="timeout"    />
         <result property="isResponseHead"    column="is_response_head"    />
         <result property="isResponseCode"    column="is_response_code"    />
+        <result property="protocolType"    column="protocol_type"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -31,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
 	<sql id="selectProjectProtocolTemplateVo">
         select ppt.template_id, ppt.template_name, ppt.project_id, ppt.head_msg, ppt.cerificate_path, ppt.encoding, ppt.timeout, 
-        ppt.is_response_head, ppt.is_response_code, ppt.create_by, ppt.create_time, ppt.update_by, ppt.update_time, ppt.remark, 
+        ppt.is_response_head, ppt.is_response_code, ppt.protocol_type, ppt.create_by, ppt.create_time, ppt.update_by, ppt.update_time, ppt.remark, 
         sp.project_name,sp.dept_id,sp.project_sign 
         from project_protocol_template ppt 
         left join sys_project sp on ppt.project_id = sp.project_id 
@@ -82,6 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="timeout != null  ">timeout,</if>
 			<if test="isResponseHead != null  ">is_response_head,</if>
 			<if test="isResponseCode != null  ">is_response_code,</if>
+			<if test="protocolType != null  and protocolType != ''  ">protocol_type,</if>
 			<if test="createBy != null  and createBy != ''  ">create_by,</if>
 			<if test="createTime != null  ">create_time,</if>
 			<if test="updateBy != null  and updateBy != ''  ">update_by,</if>
@@ -97,6 +99,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="timeout != null  ">#{timeout},</if>
 			<if test="isResponseHead != null  ">#{isResponseHead},</if>
 			<if test="isResponseCode != null  ">#{isResponseCode},</if>
+			<if test="protocolType != null  and protocolType != ''  ">#{protocolType},</if>
 			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
 			<if test="createTime != null  ">#{createTime},</if>
 			<if test="updateBy != null  and updateBy != ''  ">#{updateBy},</if>
@@ -116,6 +119,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="timeout != null  ">timeout = #{timeout},</if>
             <if test="isResponseHead != null  ">is_response_head = #{isResponseHead},</if>
             <if test="isResponseCode != null  ">is_response_code = #{isResponseCode},</if>
+            <if test="protocolType != null  and protocolType != ''  ">protocol_type = #{protocolType},</if>
             <if test="createBy != null  and createBy != ''  ">create_by = #{createBy},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
             <if test="updateBy != null  and updateBy != ''  ">update_by = #{updateBy},</if>

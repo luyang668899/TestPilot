@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header" />
+    <th:block th:include="include :: datatables-css" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>环境配置管理</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">导出数据</a> </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">项目名称：</label>
+                                        <div class="col-sm-8">
+                                            <select name="projectId" class="form-control m-b">
+                                                <option value="">全部</option>
+                                                <option th:each="project : ${projects}" th:value="${project.projectId}" th:text="${project.projectName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">环境名称：</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="environmentName" class="form-control" placeholder="请输入环境名称">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-primary" id="searchBtn">
+                                            <i class="fa fa-search"></i>&nbsp;搜索
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-success" onclick="location.href='add'">
+                                            <i class="fa fa-plus"></i>&nbsp;新增环境
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="table-responsive">
+                            <table id="bootstrap-table" class="table table-striped table-bordered table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datatables-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "testmanagmt/environment";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                modalName: "环境",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'environmentId',
+                    title: '环境ID',
+                    visible: false
+                },
+                {
+                    field: 'environmentName',
+                    title: '环境名称'
+                },
+                {
+                    field: 'environmentDesc',
+                    title: '环境描述'
+                },
+                {
+                    field: 'projectId',
+                    title: '项目ID',
+                    visible: false
+                },
+                {
+                    field: 'project.projectName',
+                    title: '所属项目'
+                },
+                {
+                    field: 'isDefault',
+                    title: '是否默认',
+                    formatter: function(value, row, index) {
+                        return value === 'Y' ? '<span class="label label-primary">是</span>' : '<span class="label label-default">否</span>';
+                    }
+                },
+                {
+                    field: 'createBy',
+                    title: '创建人'
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="setDefault(' + row.projectId + ',' + row.environmentId + ')"><i class="fa fa-star"></i>设为默认</a> ');
+                        actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="$.operate.edit(' + row.environmentId + ')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="$.operate.remove(' + row.environmentId + ')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }
+                ]
+            };
+            $.table.init(options);
+        });
+
+        function setDefault(projectId, environmentId) {
+            $.modal.confirm("确定要将此环境设置为默认环境吗？", function() {
+                $.ajax({
+                    type: "post",
+                    url: prefix + "/setDefault",
+                    data: { "projectId": projectId, "environmentId": environmentId },
+                    success: function(result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.msgSuccess("设置成功");
+                            $.table.refresh();
+                        } else {
+                            $.modal.msgError(result.msg);
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

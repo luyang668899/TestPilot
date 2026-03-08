@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testreport.trend.mapper.TestTrendMapper">
+    <resultMap type="com.luckyframe.project.testreport.trend.domain.TestTrend" id="TestTrendResult">
+        <id property="trendId" column="trend_id" />
+        <result property="projectId" column="project_id" />
+        <result property="testType" column="test_type" />
+        <result property="executeDate" column="execute_date" />
+        <result property="caseTotalCount" column="case_total_count" />
+        <result property="caseSuccCount" column="case_succ_count" />
+        <result property="caseFailCount" column="case_fail_count" />
+        <result property="successRate" column="success_rate" />
+        <result property="executeTime" column="execute_time" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectTestTrendVo">
+        select trend_id, project_id, test_type, execute_date, case_total_count, case_succ_count, case_fail_count, success_rate, execute_time, create_by, create_time, update_by, update_time from test_trend
+    </sql>
+
+    <select id="selectTestTrendById" parameterType="Long" resultMap="TestTrendResult">
+        <include refid="selectTestTrendVo" />
+        where trend_id = #{trendId}
+    </select>
+
+    <select id="selectTestTrendList" parameterType="com.luckyframe.project.testreport.trend.domain.TestTrend" resultMap="TestTrendResult">
+        <include refid="selectTestTrendVo" />
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="testType != null">
+                and test_type = #{testType}
+            </if>
+            <if test="executeDate != null">
+                and execute_date = #{executeDate}
+            </if>
+        </where>
+        order by execute_date desc
+    </select>
+
+    <insert id="insertTestTrend" parameterType="com.luckyframe.project.testreport.trend.domain.TestTrend">
+        insert into test_trend (project_id, test_type, execute_date, case_total_count, case_succ_count, case_fail_count, success_rate, execute_time, create_by, create_time, update_by, update_time)
+        values (#{projectId}, #{testType}, #{executeDate}, #{caseTotalCount}, #{caseSuccCount}, #{caseFailCount}, #{successRate}, #{executeTime}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+    <update id="updateTestTrend" parameterType="com.luckyframe.project.testreport.trend.domain.TestTrend">
+        update test_trend
+        <set>
+            <if test="projectId != null">
+                project_id = #{projectId},
+            </if>
+            <if test="testType != null">
+                test_type = #{testType},
+            </if>
+            <if test="executeDate != null">
+                execute_date = #{executeDate},
+            </if>
+            <if test="caseTotalCount != null">
+                case_total_count = #{caseTotalCount},
+            </if>
+            <if test="caseSuccCount != null">
+                case_succ_count = #{caseSuccCount},
+            </if>
+            <if test="caseFailCount != null">
+                case_fail_count = #{caseFailCount},
+            </if>
+            <if test="successRate != null">
+                success_rate = #{successRate},
+            </if>
+            <if test="executeTime != null">
+                execute_time = #{executeTime},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where trend_id = #{trendId}
+    </update>
+
+    <delete id="deleteTestTrendById" parameterType="Long">
+        delete from test_trend where trend_id = #{trendId}
+    </delete>
+
+    <delete id="deleteTestTrendByIds" parameterType="String">
+        delete from test_trend where trend_id in
+        <foreach item="trendId" collection="array" open="(" separator="," close=")">
+            #{trendId}
+        </foreach>
+    </delete>
+
+    <select id="selectProjectTestTrend" parameterType="Map" resultMap="TestTrendResult">
+        <include refid="selectTestTrendVo" />
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="testType != null">
+                and test_type = #{testType}
+            </if>
+            <if test="startDate != null">
+                and execute_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and execute_date &lt;= #{endDate}
+            </if>
+        </where>
+        order by execute_date asc
+    </select>
+
+    <select id="selectTestTrendStatistics" parameterType="Map" resultType="Map">
+        select
+            count(*) as totalCount,
+            sum(case_total_count) as totalCaseCount,
+            sum(case_succ_count) as totalSuccCount,
+            sum(case_fail_count) as totalFailCount,
+            avg(success_rate) as avgSuccessRate,
+            avg(execute_time) as avgExecuteTime
+        from test_trend
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="testType != null">
+                and test_type = #{testType}
+            </if>
+            <if test="startDate != null">
+                and execute_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and execute_date &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+</mapper>

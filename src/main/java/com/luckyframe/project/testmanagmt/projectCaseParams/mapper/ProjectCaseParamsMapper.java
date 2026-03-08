@@ -42,18 +42,11 @@ public interface ProjectCaseParamsMapper
 	/**
 	 * 根据项目ID和环境查询项目下以及所有项目公共的参数
 	 * @param projectId 项目ID
-	 * @param envName 环境
+	 * @param environmentId 环境ID
 	 * @author jerelli
 	 * @date 2020年6月18日
 	 */
-	List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvName(@Param("projectId") Integer projectId, @Param("envName") String envName);
-
-	/**
-	 * 根据项目ID查询环境
-	 * @param projectId
-	 * @return
-	 */
-	List<String> selectProjectEnvListByProjectId(@Param("projectId") Integer projectId);
+	List<ProjectCaseParams> selectProjectCaseParamsListByProjectIdAndEnvironmentId(@Param("projectId") Integer projectId, @Param("environmentId") Integer environmentId);
 	
 	/**
      * 新增用例公共参数

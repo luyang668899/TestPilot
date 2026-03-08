@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.cloud.mapper.CloudTestExecutionMapper">
+    <resultMap type="com.luckyframe.project.cloud.domain.CloudTestExecution" id="CloudTestExecutionResult">
+        <id property="executionId" column="execution_id" />
+        <result property="serviceId" column="service_id" />
+        <result property="resourceId" column="resource_id" />
+        <result property="testTaskId" column="test_task_id" />
+        <result property="status" column="status" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="result" column="result" />
+    </resultMap>
+
+    <sql id="selectCloudTestExecutionVo">
+        select execution_id, service_id, resource_id, test_task_id, status, start_time, end_time, result from cloud_test_execution
+    </sql>
+
+    <select id="selectCloudTestExecutionByExecutionId" parameterType="Integer" resultMap="CloudTestExecutionResult">
+        <include refid="selectCloudTestExecutionVo" />
+        where execution_id = #{executionId}
+    </select>
+
+    <select id="selectCloudTestExecutionList" parameterType="com.luckyframe.project.cloud.domain.CloudTestExecution" resultMap="CloudTestExecutionResult">
+        <include refid="selectCloudTestExecutionVo" />
+        <where>
+            <if test="serviceId != null">
+                and service_id = #{serviceId}
+            </if>
+            <if test="resourceId != null">
+                and resource_id = #{resourceId}
+            </if>
+            <if test="testTaskId != null">
+                and test_task_id = #{testTaskId}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCloudTestExecution" parameterType="com.luckyframe.project.cloud.domain.CloudTestExecution" useGeneratedKeys="true" keyProperty="executionId">
+        insert into cloud_test_execution
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serviceId != null">service_id,</if>
+            <if test="resourceId != null">resource_id,</if>
+            <if test="testTaskId != null">test_task_id,</if>
+            <if test="status != null">status,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="result != null">result,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serviceId != null">#{serviceId},</if>
+            <if test="resourceId != null">#{resourceId},</if>
+            <if test="testTaskId != null">#{testTaskId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="result != null">#{result},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCloudTestExecution" parameterType="com.luckyframe.project.cloud.domain.CloudTestExecution">
+        update cloud_test_execution
+        <set>
+            <if test="serviceId != null">service_id = #{serviceId},</if>
+            <if test="resourceId != null">resource_id = #{resourceId},</if>
+            <if test="testTaskId != null">test_task_id = #{testTaskId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="result != null">result = #{result},</if>
+        </set>
+        where execution_id = #{executionId}
+    </update>
+
+    <delete id="deleteCloudTestExecutionByExecutionId" parameterType="Integer">
+        delete from cloud_test_execution where execution_id = #{executionId}
+    </delete>
+
+    <delete id="deleteCloudTestExecutionByExecutionIds" parameterType="Integer[]">
+        delete from cloud_test_execution where execution_id in
+        <foreach item="executionId" collection="array" open="(" separator="," close=")">
+            #{executionId}
+        </foreach>
+    </delete>
+
+    <select id="selectCloudTestExecutionByServiceId" parameterType="Integer" resultMap="CloudTestExecutionResult">
+        <include refid="selectCloudTestExecutionVo" />
+        where service_id = #{serviceId}
+    </select>
+
+    <select id="selectCloudTestExecutionByResourceId" parameterType="Integer" resultMap="CloudTestExecutionResult">
+        <include refid="selectCloudTestExecutionVo" />
+        where resource_id = #{resourceId}
+    </select>
+</mapper>

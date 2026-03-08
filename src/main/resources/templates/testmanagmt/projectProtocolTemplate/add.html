@@ -32,16 +32,27 @@
 				</div>
 			</div>
 			<div class="form-group">	
+				<label class="col-sm-3 control-label">协议类型：</label>
+				<div class="col-sm-8">
+					<select id="protocolType" name="protocolType" class="form-control m-b">
+						<option value="HTTP" selected>HTTP</option>
+						<option value="WebSocket">WebSocket</option>
+						<option value="gRPC">gRPC</option>
+						<option value="MQTT">MQTT</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
 				<label class="col-sm-3 control-label">编码格式：</label>
 				<div class="col-sm-8">
 					<div class="radio-box">
 					  <input type="radio" id="encoding" name="encoding" value="UTF-8" checked>
 					  <label>UTF-8编码</label>
-				    </div>
-				    <div class="radio-box">
-				      <input type="radio" id="encoding" name="encoding" value="GBK">
+					</div>
+					<div class="radio-box">
+					  <input type="radio" id="encoding" name="encoding" value="GBK">
 					  <label>GBK编码</label>
-				    </div>
+					</div>
 				</div>
 			</div>
 			<div class="form-group">	

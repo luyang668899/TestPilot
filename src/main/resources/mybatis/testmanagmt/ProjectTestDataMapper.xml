@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testmanagmt.projectTestData.mapper.ProjectTestDataMapper">
+    <resultMap type="com.luckyframe.project.testmanagmt.projectTestData.domain.ProjectTestData" id="ProjectTestDataResult">
+        <id property="dataId" column="data_id" />
+        <result property="projectId" column="project_id" />
+        <result property="dataName" column="data_name" />
+        <result property="dataType" column="data_type" />
+        <result property="dataValue" column="data_value" />
+        <result property="environmentId" column="environment_id" />
+        <result property="description" column="description" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectProjectTestDataVo">
+        select data_id, project_id, data_name, data_type, data_value, environment_id, description, create_by, create_time, update_by, update_time from project_test_data
+    </sql>
+
+    <select id="selectProjectTestDataById" parameterType="Long" resultMap="ProjectTestDataResult">
+        <include refid="selectProjectTestDataVo" />
+        where data_id = #{dataId}
+    </select>
+
+    <select id="selectProjectTestDataList" parameterType="com.luckyframe.project.testmanagmt.projectTestData.domain.ProjectTestData" resultMap="ProjectTestDataResult">
+        <include refid="selectProjectTestDataVo" />
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="dataName != null and dataName != ''">
+                and data_name like concat('%', #{dataName}, '%')
+            </if>
+            <if test="dataType != null and dataType != ''">
+                and data_type = #{dataType}
+            </if>
+            <if test="environmentId != null">
+                and environment_id = #{environmentId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertProjectTestData" parameterType="com.luckyframe.project.testmanagmt.projectTestData.domain.ProjectTestData">
+        insert into project_test_data (project_id, data_name, data_type, data_value, environment_id, description, create_by, create_time, update_by, update_time)
+        values (#{projectId}, #{dataName}, #{dataType}, #{dataValue}, #{environmentId}, #{description}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+    <update id="updateProjectTestData" parameterType="com.luckyframe.project.testmanagmt.projectTestData.domain.ProjectTestData">
+        update project_test_data
+        <set>
+            <if test="projectId != null">
+                project_id = #{projectId},
+            </if>
+            <if test="dataName != null">
+                data_name = #{dataName},
+            </if>
+            <if test="dataType != null">
+                data_type = #{dataType},
+            </if>
+            <if test="dataValue != null">
+                data_value = #{dataValue},
+            </if>
+            <if test="environmentId != null">
+                environment_id = #{environmentId},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where data_id = #{dataId}
+    </update>
+
+    <delete id="deleteProjectTestDataById" parameterType="Long">
+        delete from project_test_data where data_id = #{dataId}
+    </delete>
+
+    <delete id="deleteProjectTestDataByIds" parameterType="String">
+        delete from project_test_data where data_id in
+        <foreach item="dataId" collection="array" open="(" separator="," close=")">
+            #{dataId}
+        </foreach>
+    </delete>
+
+    <select id="selectProjectTestDataByProjectAndEnvironment" parameterType="Long" resultMap="ProjectTestDataResult">
+        <include refid="selectProjectTestDataVo" />
+        where project_id = #{projectId} and environment_id = #{environmentId}
+    </select>
+
+    <select id="selectProjectTestDataByProjectId" parameterType="Long" resultMap="ProjectTestDataResult">
+        <include refid="selectProjectTestDataVo" />
+        where project_id = #{projectId}
+    </select>
+</mapper>

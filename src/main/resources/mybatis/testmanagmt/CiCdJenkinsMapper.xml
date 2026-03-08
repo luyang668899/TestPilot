@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testmanagmt.cicd.mapper.CiCdJenkinsMapper">
+    <resultMap type="CiCdJenkins" id="CiCdJenkinsResult">
+        <id property="jenkinsId" column="jenkins_id" />
+        <result property="projectId" column="project_id" />
+        <result property="projectName" column="project_name" />
+        <result property="jenkinsName" column="jenkins_name" />
+        <result property="jenkinsUrl" column="jenkins_url" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="apiToken" column="api_token" />
+        <result property="status" column="status" />
+        <result property="description" column="description" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectCiCdJenkinsVo">
+        select jenkins_id, project_id, project_name, jenkins_name, jenkins_url, username, password, api_token, status, description, create_time, update_time from project_cicd_jenkins
+    </sql>
+
+    <select id="selectCiCdJenkinsById" parameterType="Long" resultMap="CiCdJenkinsResult">
+        <include refid="selectCiCdJenkinsVo" />
+        where jenkins_id = #{jenkinsId}
+    </select>
+
+    <select id="selectCiCdJenkinsList" parameterType="CiCdJenkins" resultMap="CiCdJenkinsResult">
+        <include refid="selectCiCdJenkinsVo" />
+        <where>
+            <if test="projectId != null">
+                and project_id = #{projectId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="jenkinsName != null and jenkinsName != ''">
+                and jenkins_name like concat('%', #{jenkinsName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCiCdJenkins" parameterType="CiCdJenkins" useGeneratedKeys="true" keyProperty="jenkinsId">
+        insert into project_cicd_jenkins
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="projectName != null">project_name,</if>
+            <if test="jenkinsName != null">jenkins_name,</if>
+            <if test="jenkinsUrl != null">jenkins_url,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="apiToken != null">api_token,</if>
+            <if test="status != null">status,</if>
+            <if test="description != null">description,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="projectName != null">#{projectName},</if>
+            <if test="jenkinsName != null">#{jenkinsName},</if>
+            <if test="jenkinsUrl != null">#{jenkinsUrl},</if>
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="apiToken != null">#{apiToken},</if>
+            <if test="status != null">#{status},</if>
+            <if test="description != null">#{description},</if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateCiCdJenkins" parameterType="CiCdJenkins">
+        update project_cicd_jenkins
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="jenkinsName != null">jenkins_name = #{jenkinsName},</if>
+            <if test="jenkinsUrl != null">jenkins_url = #{jenkinsUrl},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="apiToken != null">api_token = #{apiToken},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            update_time = now()
+        </set>
+        where jenkins_id = #{jenkinsId}
+    </update>
+
+    <delete id="deleteCiCdJenkinsById" parameterType="Long">
+        delete from project_cicd_jenkins where jenkins_id = #{jenkinsId}
+    </delete>
+
+    <delete id="deleteCiCdJenkinsByIds" parameterType="String">
+        delete from project_cicd_jenkins where jenkins_id in
+        <foreach item="jenkinsId" collection="array" open="(" separator="," close=")">
+            #{jenkinsId}
+        </foreach>
+    </delete>
+
+    <select id="selectCiCdJenkinsByProjectId" parameterType="Long" resultMap="CiCdJenkinsResult">
+        <include refid="selectCiCdJenkinsVo" />
+        where project_id = #{projectId}
+    </select>
+
+    <select id="selectCiCdJenkinsByStatus" parameterType="Integer" resultMap="CiCdJenkinsResult">
+        <include refid="selectCiCdJenkinsVo" />
+        where status = #{status}
+    </select>
+</mapper>

@@ -10,7 +10,7 @@
 -- ----------------------------
 -- 1、增加用户个性化设置查询时间段
 -- ----------------------------
-alter table sys_user add date_quantum int(4) default 7 comment '用户日期默认查询条件，单位：天';
+ALTER TABLE sys_user ADD COLUMN IF NOT EXISTS date_quantum int(4) default 7 comment '用户日期默认查询条件，单位：天';
 -- ----------------------------
 -- 2、修改客户端驱动路径字段长度
 -- ----------------------------

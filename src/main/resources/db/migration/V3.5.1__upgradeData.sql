@@ -38,25 +38,25 @@ CREATE TABLE if  not exists  `project_page_detail`  (
                                                         PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '页面详情' ROW_FORMAT = DYNAMIC;
 
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1115, 'Web页面元素管理', 4, 7, '#', 'M', '0', '', '#', 'admin', '2022-05-27 17:48:28', 'dyl', '2022-05-27 17:48:28', '页面配置管理菜单');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1116, '页面管理', 1115, 1, '/testmanagmt/projectPageObject', 'C', '0', 'testmanagmt:projectPageObject:view', '#', 'admin', '2022-05-27 17:48:28', 'dyl', '2022-05-27 17:48:28', '页面配置管理菜单');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1117, '页面配置管理查询', 1116, 1, '#', 'F', '0', 'testmanagmt:projectPageObject:list', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1118, '页面配置管理新增', 1116, 2, '#', 'F', '0', 'testmanagmt:projectPageObject:add', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1119, '页面配置管理修改', 1116, 3, '#', 'F', '0', 'testmanagmt:projectPageObject:edit', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1120, '页面配置管理删除', 1116, 4, '#', 'F', '0', 'testmanagmt:projectPageObject:remove', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1121, '页面详情', 1115, 2, '/testmanagmt/projectPageDetail', 'C', '1', 'testmanagmt:projectPageDetail:view', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '页面详情菜单');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1122, '页面详情查询', 1121, 1, '#', 'F', '0', 'testmanagmt:projectPageDetail:list', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1123, '页面详情新增', 1121, 2, '#', 'F', '0', 'testmanagmt:projectPageDetail:add', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1124, '页面详情修改', 1121, 3, '#', 'F', '0', 'testmanagmt:projectPageDetail:edit', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');
-INSERT INTO sys_menu
+INSERT IGNORE INTO sys_menu
 VALUES (1125, '页面详情删除', 1121, 4, '#', 'F', '0', 'testmanagmt:projectPageDetail:remove', '#', 'admin', '2022-05-27 17:48:28', 'admin', '2022-05-27 17:48:28', '');

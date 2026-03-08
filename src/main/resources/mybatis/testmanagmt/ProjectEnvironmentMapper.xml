@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.testmanagmt.projectEnvironment.mapper.ProjectEnvironmentMapper">
+	<resultMap type="com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment" id="ProjectEnvironmentResult">
+		<id property="environmentId" column="environment_id" />
+		<result property="environmentName" column="environment_name" />
+		<result property="environmentDesc" column="environment_desc" />
+		<result property="projectId" column="project_id" />
+		<result property="isDefault" column="is_default" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+		<association property="project" column="project_id" javaType="com.luckyframe.project.system.project.domain.Project" resultMap="com.luckyframe.project.system.project.mapper.ProjectMapper.ProjectResult" />
+	</resultMap>
+
+	<sql id="selectProjectEnvironmentVo">
+		select environment_id, environment_name, environment_desc, project_id, is_default, create_by, create_time, update_by, update_time, remark from project_environment
+	</sql>
+
+	<select id="selectProjectEnvironmentById" parameterType="Integer" resultMap="ProjectEnvironmentResult">
+		<include refid="selectProjectEnvironmentVo" />
+		where environment_id = #{environmentId}
+	</select>
+
+	<select id="selectProjectEnvironmentList" parameterType="com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment" resultMap="ProjectEnvironmentResult">
+		<include refid="selectProjectEnvironmentVo" />
+		<where>
+			<if test="environmentName != null and environmentName != ''">
+				and environment_name like concat('%', #{environmentName}, '%')
+			</if>
+			<if test="projectId != null">
+				and project_id = #{projectId}
+			</if>
+			<if test="isDefault != null and isDefault != ''">
+				and is_default = #{isDefault}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertProjectEnvironment" parameterType="com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment">
+		insert into project_environment (environment_name, environment_desc, project_id, is_default, create_by, create_time, update_by, update_time, remark)
+		values (#{environmentName}, #{environmentDesc}, #{projectId}, #{isDefault}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime}, #{remark})
+	</insert>
+
+	<update id="updateProjectEnvironment" parameterType="com.luckyframe.project.testmanagmt.projectEnvironment.domain.ProjectEnvironment">
+		update project_environment
+		<set>
+			<if test="environmentName != null and environmentName != ''">
+				environment_name = #{environmentName},
+			</if>
+			<if test="environmentDesc != null and environmentDesc != ''">
+				environment_desc = #{environmentDesc},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId},
+			</if>
+			<if test="isDefault != null and isDefault != ''">
+				is_default = #{isDefault},
+			</if>
+			<if test="updateBy != null and updateBy != ''">
+				update_by = #{updateBy},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+		</set>
+		where environment_id = #{environmentId}
+	</update>
+
+	<delete id="deleteProjectEnvironmentById" parameterType="Integer">
+		delete from project_environment where environment_id = #{environmentId}
+	</delete>
+
+	<delete id="deleteProjectEnvironmentByIds" parameterType="String">
+		delete from project_environment where environment_id in 
+		<foreach item="environmentId" collection="array" open="(" separator="," close=")">
+			#{environmentId}
+		</foreach>
+	</delete>
+
+	<select id="selectProjectEnvironmentByProjectId" parameterType="Integer" resultMap="ProjectEnvironmentResult">
+		<include refid="selectProjectEnvironmentVo" />
+		where project_id = #{projectId}
+	</select>
+
+	<select id="selectProjectEnvironmentByName" resultMap="ProjectEnvironmentResult">
+		<include refid="selectProjectEnvironmentVo" />
+		where project_id = #{projectId} and environment_name = #{environmentName}
+	</select>
+
+	<select id="selectDefaultEnvironmentByProjectId" parameterType="Integer" resultMap="ProjectEnvironmentResult">
+		<include refid="selectProjectEnvironmentVo" />
+		where project_id = #{projectId} and is_default = 'Y'
+	</select>
+</mapper>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formSearch" class="form-inline">
+                    <div class="form-group">
+                        <label class="control-label">Kubernetes名称：</label>
+                        <input type="text" name="kubernetesName" class="form-control" placeholder="请输入Kubernetes名称" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">集群地址：</label>
+                        <input type="text" name="clusterUrl" class="form-control" placeholder="请输入集群地址" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">状态：</label>
+                        <select name="status" class="form-control m-b">
+                            <option value="">全部</option>
+                            <option value="启用">启用</option>
+                            <option value="禁用">禁用</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
+                    <button type="button" class="btn btn-white" id="reset">重置</button>
+                </form>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="btnAdd"><i class="fa fa-plus"></i> 新增</button>
+                    <button type="button" class="btn btn-danger" id="btnDelete"><i class="fa fa-remove"></i> 删除</button>
+                    <button type="button" class="btn btn-success" id="btnTest"><i class="fa fa-play"></i> 测试连接</button>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info" id="btnExcel"><i class="fa fa-file-excel-o"></i> 导出</button>
+                </div>
+            </div>
+
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-toolbar="#toolbar" data-search="false" data-show-columns="true" data-show-export="false" data-show-refresh="true" data-show-toggle="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]">
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "testmanagmt/kubernetes";
+
+        $(function() {
+            load();
+        });
+
+        function load() {
+            $('#bootstrap-table').bootstrapTable({
+                url: prefix + '/list',
+                columns: [
+                    {
+                        checkbox: true
+                    },
+                    {
+                        field: 'kubernetesId',
+                        title: 'ID',
+                        align: 'center',
+                        width: '50px'
+                    },
+                    {
+                        field: 'kubernetesName',
+                        title: 'Kubernetes名称',
+                        align: 'left'
+                    },
+                    {
+                        field: 'clusterUrl',
+                        title: '集群地址',
+                        align: 'left'
+                    },
+                    {
+                        field: 'namespace',
+                        title: '命名空间',
+                        align: 'center',
+                        width: '120px'
+                    },
+                    {
+                        field: 'authType',
+                        title: '认证方式',
+                        align: 'center',
+                        width: '100px'
+                    },
+                    {
+                        field: 'kubeconfigPath',
+                        title: 'Kubeconfig路径',
+                        align: 'left'
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                        align: 'center',
+                        width: '80px',
+                        formatter: function(value, row, index) {
+                            if (value === '启用') {
+                                return '<span class="label label-success">' + value + '</span>';
+                            } else {
+                                return '<span class="label label-danger">' + value + '</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'description',
+                        title: '描述',
+                        align: 'left'
+                    },
+                    {
+                        field: 'createBy',
+                        title: '创建者',
+                        align: 'center',
+                        width: '100px'
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间',
+                        align: 'center',
+                        width: '180px',
+                        formatter: function(value, row, index) {
+                            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '';
+                        }
+                    },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        width: '180px',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="executeTest(' + row.kubernetesId + ')"><i class="fa fa-play"></i> 执行测试</a> ');
+                            actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="edit(' + row.kubernetesId + ')"><i class="fa fa-edit"></i> 编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="remove(' + row.kubernetesId + ')"><i class="fa fa-remove"></i> 删除</a>');
+                            return actions.join('');
+                        }
+                    }
+                ]
+            });
+        }
+
+        function reLoad() {
+            $('#bootstrap-table').bootstrapTable('refresh');
+        }
+
+        $('#btnAdd').click(function() {
+            openModal('新增Kubernetes配置', prefix + '/add');
+        });
+
+        function edit(kubernetesId) {
+            openModal('编辑Kubernetes配置', prefix + '/edit/' + kubernetesId);
+        }
+
+        function remove(kubernetesId) {
+            $.modal.confirm('确定要删除该Kubernetes配置吗？', function() {
+                $.ajax({
+                    url: prefix + '/remove',
+                    type: 'post',
+                    data: { 'ids': kubernetesId },
+                    success: function(data) {
+                        if (data.code === 0) {
+                            $.modal.msgSuccess(data.msg);
+                            reLoad();
+                        } else {
+                            $.modal.msgError(data.msg);
+                        }
+                    }
+                });
+            });
+        }
+
+        $('#btnDelete').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                $.modal.msgWarning('请选择要删除的Kubernetes配置');
+                return;
+            }
+            var ids = [];
+            $.each(rows, function(i, row) {
+                ids.push(row.kubernetesId);
+            });
+            $.modal.confirm('确定要删除选中的Kubernetes配置吗？', function() {
+                $.ajax({
+                    url: prefix + '/remove',
+                    type: 'post',
+                    data: { 'ids': ids.join(',') },
+                    success: function(data) {
+                        if (data.code === 0) {
+                            $.modal.msgSuccess(data.msg);
+                            reLoad();
+                        } else {
+                            $.modal.msgError(data.msg);
+                        }
+                    }
+                });
+            });
+        });
+
+        $('#btnTest').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length != 1) {
+                $.modal.msgWarning('请选择一个Kubernetes配置进行测试');
+                return;
+            }
+            var kubernetesId = rows[0].kubernetesId;
+            $.ajax({
+                url: prefix + '/testConnection',
+                type: 'post',
+                data: { 'kubernetesId': kubernetesId, 'clusterUrl': rows[0].clusterUrl, 'namespace': rows[0].namespace, 'authType': rows[0].authType, 'kubeconfigPath': rows[0].kubeconfigPath },
+                success: function(data) {
+                    $.modal.msgSuccess(data.msg);
+                }
+            });
+        });
+
+        function executeTest(kubernetesId) {
+            var testCaseId = prompt('请输入测试用例ID：');
+            if (testCaseId) {
+                $.ajax({
+                    url: prefix + '/executeTest',
+                    type: 'post',
+                    data: { 'kubernetesId': kubernetesId, 'testCaseId': testCaseId },
+                    success: function(data) {
+                        $.modal.msgSuccess(data.msg);
+                    }
+                });
+            }
+        }
+
+        $('#btnExcel').click(function() {
+            window.location.href = prefix + '/export?' + $('#formSearch').serialize();
+        });
+
+        $('#reset').click(function() {
+            $('#formSearch')[0].reset();
+        });
+    </script>
+</body>
+</html>

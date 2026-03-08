@@ -1,0 +1,46 @@
+-- 创建测试趋势表
+CREATE TABLE IF NOT EXISTS `project_test_trend` (
+  `trend_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '趋势ID',
+  `project_id` bigint(20) NOT NULL COMMENT '项目ID',
+  `project_name` varchar(100) DEFAULT NULL COMMENT '项目名称',
+  `trend_type` int(11) NOT NULL COMMENT '趋势类型：1-执行次数，2-成功率，3-执行时长',
+  `statistics_date` date NOT NULL COMMENT '统计日期',
+  `execution_count` int(11) DEFAULT '0' COMMENT '执行次数',
+  `success_count` int(11) DEFAULT '0' COMMENT '成功次数',
+  `failure_count` int(11) DEFAULT '0' COMMENT '失败次数',
+  `success_rate` decimal(10,2) DEFAULT '0.00' COMMENT '成功率',
+  `avg_execution_time` decimal(10,2) DEFAULT '0.00' COMMENT '平均执行时长(秒)',
+  `avg_execution_count` decimal(10,2) DEFAULT '0.00' COMMENT '平均执行次数',
+  `avg_success_rate` decimal(10,2) DEFAULT '0.00' COMMENT '平均成功率',
+  `avg_avg_execution_time` decimal(10,2) DEFAULT '0.00' COMMENT '平均执行时长平均值',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`trend_id`),
+  KEY `idx_project_id` (`project_id`),
+  KEY `idx_trend_type` (`trend_type`),
+  KEY `idx_statistics_date` (`statistics_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='测试趋势表';
+
+-- 插入测试数据
+INSERT INTO `project_test_trend` (`project_id`, `project_name`, `trend_type`, `statistics_date`, `execution_count`, `success_count`, `failure_count`, `success_rate`, `avg_execution_time`, `avg_execution_count`, `avg_success_rate`, `avg_avg_execution_time`) VALUES
+(1, '示例项目', 1, CURDATE() - INTERVAL 7 DAY, 10, 8, 2, 80.00, 10.50, 8.00, 75.00, 12.00),
+(1, '示例项目', 1, CURDATE() - INTERVAL 6 DAY, 12, 10, 2, 83.33, 9.80, 8.50, 76.67, 11.50),
+(1, '示例项目', 1, CURDATE() - INTERVAL 5 DAY, 8, 7, 1, 87.50, 11.20, 9.00, 78.33, 11.00),
+(1, '示例项目', 1, CURDATE() - INTERVAL 4 DAY, 15, 12, 3, 80.00, 8.90, 9.50, 80.00, 10.50),
+(1, '示例项目', 1, CURDATE() - INTERVAL 3 DAY, 13, 11, 2, 84.62, 10.10, 10.00, 81.67, 10.00),
+(1, '示例项目', 1, CURDATE() - INTERVAL 2 DAY, 9, 8, 1, 88.89, 11.50, 10.50, 83.33, 9.50),
+(1, '示例项目', 1, CURDATE() - INTERVAL 1 DAY, 11, 9, 2, 81.82, 9.70, 11.00, 85.00, 9.00),
+(1, '示例项目', 2, CURDATE() - INTERVAL 7 DAY, 10, 8, 2, 80.00, 10.50, 8.00, 75.00, 12.00),
+(1, '示例项目', 2, CURDATE() - INTERVAL 6 DAY, 12, 10, 2, 83.33, 9.80, 8.50, 76.67, 11.50),
+(1, '示例项目', 2, CURDATE() - INTERVAL 5 DAY, 8, 7, 1, 87.50, 11.20, 9.00, 78.33, 11.00),
+(1, '示例项目', 2, CURDATE() - INTERVAL 4 DAY, 15, 12, 3, 80.00, 8.90, 9.50, 80.00, 10.50),
+(1, '示例项目', 2, CURDATE() - INTERVAL 3 DAY, 13, 11, 2, 84.62, 10.10, 10.00, 81.67, 10.00),
+(1, '示例项目', 2, CURDATE() - INTERVAL 2 DAY, 9, 8, 1, 88.89, 11.50, 10.50, 83.33, 9.50),
+(1, '示例项目', 2, CURDATE() - INTERVAL 1 DAY, 11, 9, 2, 81.82, 9.70, 11.00, 85.00, 9.00),
+(1, '示例项目', 3, CURDATE() - INTERVAL 7 DAY, 10, 8, 2, 80.00, 10.50, 8.00, 75.00, 12.00),
+(1, '示例项目', 3, CURDATE() - INTERVAL 6 DAY, 12, 10, 2, 83.33, 9.80, 8.50, 76.67, 11.50),
+(1, '示例项目', 3, CURDATE() - INTERVAL 5 DAY, 8, 7, 1, 87.50, 11.20, 9.00, 78.33, 11.00),
+(1, '示例项目', 3, CURDATE() - INTERVAL 4 DAY, 15, 12, 3, 80.00, 8.90, 9.50, 80.00, 10.50),
+(1, '示例项目', 3, CURDATE() - INTERVAL 3 DAY, 13, 11, 2, 84.62, 10.10, 10.00, 81.67, 10.00),
+(1, '示例项目', 3, CURDATE() - INTERVAL 2 DAY, 9, 8, 1, 88.89, 11.50, 10.50, 83.33, 9.50),
+(1, '示例项目', 3, CURDATE() - INTERVAL 1 DAY, 11, 9, 2, 81.82, 9.70, 11.00, 85.00, 9.00);

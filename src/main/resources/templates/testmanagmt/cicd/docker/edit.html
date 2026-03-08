@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>编辑Docker配置</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <form class="form-horizontal m-t" id="formEdit">
+                            <input type="hidden" name="dockerId" th:value="${ciCdDocker.dockerId}">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Docker名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="dockerName" th:value="${ciCdDocker.dockerName}" placeholder="请输入Docker名称" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Docker地址：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="dockerUrl" th:value="${ciCdDocker.dockerUrl}" placeholder="请输入Docker地址，例如：tcp://localhost" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">端口：</label>
+                                <div class="col-sm-8">
+                                    <input type="number" class="form-control" name="port" th:value="${ciCdDocker.port}" placeholder="请输入端口，例如：2375" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">用户名：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="username" th:value="${ciCdDocker.username}" placeholder="请输入用户名">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">密码：</label>
+                                <div class="col-sm-8">
+                                    <input type="password" class="form-control" name="password" placeholder="请输入密码">
+                                    <span class="help-block m-b-none">留空表示不修改密码</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control m-b" name="status" required>
+                                        <option value="启用" th:selected="${ciCdDocker.status eq '启用'}">启用</option>
+                                        <option value="禁用" th:selected="${ciCdDocker.status eq '禁用'}">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">描述：</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" placeholder="请输入描述" rows="3" th:text="${ciCdDocker.description}"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-3">
+                                    <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> 保存</button>
+                                    <button class="btn btn-white" type="button" onclick="closeModal()"><i class="fa fa-times"></i> 取消</button>
+                                    <button class="btn btn-success" type="button" id="btnTestConnection" style="margin-left: 10px;"><i class="fa fa-play"></i> 测试连接</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "testmanagmt/docker";
+
+        $(function() {
+            $('#formEdit').validate({
+                rules: {
+                    dockerName: {
+                        required: true,
+                        maxlength: 50
+                    },
+                    dockerUrl: {
+                        required: true,
+                        maxlength: 100
+                    },
+                    port: {
+                        required: true,
+                        digits: true,
+                        min: 1,
+                        max: 65535
+                    }
+                },
+                submitHandler: function(form) {
+                    $.ajax({
+                        type: "post",
+                        url: prefix + "/edit",
+                        data: $(form).serialize(),
+                        success: function(data) {
+                            if (data.code == 0) {
+                                parent.layer.msg(data.msg, {icon: 1});
+                                parent.reLoad();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            } else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#btnTestConnection').click(function() {
+                var dockerUrl = $('input[name="dockerUrl"]').val();
+                var port = $('input[name="port"]').val();
+                var username = $('input[name="username"]').val();
+                var password = $('input[name="password"]').val();
+
+                if (!dockerUrl || !port) {
+                    layer.msg('请填写Docker地址和端口', {icon: 5});
+                    return;
+                }
+
+                $.ajax({
+                    url: prefix + '/testConnection',
+                    type: 'post',
+                    data: { 'dockerUrl': dockerUrl, 'port': port, 'username': username, 'password': password },
+                    success: function(data) {
+                        layer.msg(data.msg, {icon: 1});
+                    }
+                });
+            });
+        });
+
+        function closeModal() {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        }
+    </script>
+</body>
+</html>

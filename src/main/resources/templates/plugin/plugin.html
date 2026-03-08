@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formSearch" class="form-inline">
+                    <div class="form-group">
+                        <label class="control-label">插件名称：</label>
+                        <input type="text" name="pluginName" class="form-control" placeholder="请输入插件名称" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">插件类型：</label>
+                        <select name="pluginType" class="form-control m-b">
+                            <option value="">全部</option>
+                            <option value="测试驱动插件">测试驱动插件</option>
+                            <option value="接口测试插件">接口测试插件</option>
+                            <option value="UI测试插件">UI测试插件</option>
+                            <option value="监控和通知插件">监控和通知插件</option>
+                            <option value="工具和辅助插件">工具和辅助插件</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">状态：</label>
+                        <select name="status" class="form-control m-b">
+                            <option value="">全部</option>
+                            <option value="启用">启用</option>
+                            <option value="禁用">禁用</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
+                    <button type="button" class="btn btn-white" id="reset">重置</button>
+                </form>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="btnAdd"><i class="fa fa-plus"></i> 新增</button>
+                    <button type="button" class="btn btn-danger" id="btnDelete"><i class="fa fa-remove"></i> 删除</button>
+                    <button type="button" class="btn btn-success" id="btnEnable"><i class="fa fa-check"></i> 启用</button>
+                    <button type="button" class="btn btn-warning" id="btnDisable"><i class="fa fa-ban"></i> 禁用</button>
+                    <button type="button" class="btn btn-info" id="btnTest"><i class="fa fa-play"></i> 测试</button>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info" id="btnExcel"><i class="fa fa-file-excel-o"></i> 导出</button>
+                </div>
+            </div>
+
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-toolbar="#toolbar" data-search="false" data-show-columns="true" data-show-export="false" data-show-refresh="true" data-show-toggle="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]">
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "plugin";
+
+        $(function() {
+            load();
+        });
+
+        function load() {
+            $('#bootstrap-table').bootstrapTable({
+                url: prefix + '/list',
+                columns: [
+                    {
+                        checkbox: true
+                    },
+                    {
+                        field: 'pluginId',
+                        title: 'ID',
+                        align: 'center',
+                        width: '50px'
+                    },
+                    {
+                        field: 'pluginName',
+                        title: '插件名称',
+                        align: 'left'
+                    },
+                    {
+                        field: 'pluginType',
+                        title: '插件类型',
+                        align: 'center',
+                        width: '120px'
+                    },
+                    {
+                        field: 'pluginVersion',
+                        title: '插件版本',
+                        align: 'center',
+                        width: '100px'
+                    },
+                    {
+                        field: 'pluginPath',
+                        title: '插件路径',
+                        align: 'left'
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                        align: 'center',
+                        width: '80px',
+                        formatter: function(value, row, index) {
+                            if (value === '启用') {
+                                return '<span class="label label-success">' + value + '</span>';
+                            } else {
+                                return '<span class="label label-danger">' + value + '</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'description',
+                        title: '描述',
+                        align: 'left'
+                    },
+                    {
+                        field: 'createBy',
+                        title: '创建者',
+                        align: 'center',
+                        width: '100px'
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间',
+                        align: 'center',
+                        width: '180px',
+                        formatter: function(value, row, index) {
+                            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : '';
+                        }
+                    },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        width: '200px',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            if (row.status === '禁用') {
+                                actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="enable(' + row.pluginId + ')"><i class="fa fa-check"></i> 启用</a> ');
+                            } else {
+                                actions.push('<a class="btn btn-warning btn-xs" href="javascript:void(0)" onclick="disable(' + row.pluginId + ')"><i class="fa fa-ban"></i> 禁用</a> ');
+                            }
+                            actions.push('<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="test(' + row.pluginId + ')"><i class="fa fa-play"></i> 测试</a> ');
+                            actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="edit(' + row.pluginId + ')"><i class="fa fa-edit"></i> 编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="remove(' + row.pluginId + ')"><i class="fa fa-remove"></i> 删除</a>');
+                            return actions.join('');
+                        }
+                    }
+                ]
+            });
+        }
+
+        function reLoad() {
+            $('#bootstrap-table').bootstrapTable('refresh');
+        }
+
+        $('#btnAdd').click(function() {
+            openModal('新增插件', prefix + '/add');
+        });
+
+        function edit(pluginId) {
+            openModal('编辑插件', prefix + '/edit/' + pluginId);
+        }
+
+        function remove(pluginId) {
+            $.modal.confirm('确定要删除该插件吗？', function() {
+                $.ajax({
+                    url: prefix + '/remove',
+                    type: 'post',
+                    data: { 'ids': pluginId },
+                    success: function(data) {
+                        if (data.code === 0) {
+                            $.modal.msgSuccess(data.msg);
+                            reLoad();
+                        } else {
+                            $.modal.msgError(data.msg);
+                        }
+                    }
+                });
+            });
+        }
+
+        $('#btnDelete').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                $.modal.msgWarning('请选择要删除的插件');
+                return;
+            }
+            var ids = [];
+            $.each(rows, function(i, row) {
+                ids.push(row.pluginId);
+            });
+            $.modal.confirm('确定要删除选中的插件吗？', function() {
+                $.ajax({
+                    url: prefix + '/remove',
+                    type: 'post',
+                    data: { 'ids': ids.join(',') },
+                    success: function(data) {
+                        if (data.code === 0) {
+                            $.modal.msgSuccess(data.msg);
+                            reLoad();
+                        } else {
+                            $.modal.msgError(data.msg);
+                        }
+                    }
+                });
+            });
+        });
+
+        function enable(pluginId) {
+            $.ajax({
+                url: prefix + '/enable',
+                type: 'post',
+                data: { 'pluginId': pluginId },
+                success: function(data) {
+                    if (data.code === 0) {
+                        $.modal.msgSuccess(data.msg);
+                        reLoad();
+                    } else {
+                        $.modal.msgError(data.msg);
+                    }
+                }
+            });
+        }
+
+        $('#btnEnable').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                $.modal.msgWarning('请选择要启用的插件');
+                return;
+            }
+            var ids = [];
+            $.each(rows, function(i, row) {
+                ids.push(row.pluginId);
+            });
+            $.each(ids, function(i, id) {
+                enable(id);
+            });
+        });
+
+        function disable(pluginId) {
+            $.ajax({
+                url: prefix + '/disable',
+                type: 'post',
+                data: { 'pluginId': pluginId },
+                success: function(data) {
+                    if (data.code === 0) {
+                        $.modal.msgSuccess(data.msg);
+                        reLoad();
+                    } else {
+                        $.modal.msgError(data.msg);
+                    }
+                }
+            });
+        }
+
+        $('#btnDisable').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                $.modal.msgWarning('请选择要禁用的插件');
+                return;
+            }
+            var ids = [];
+            $.each(rows, function(i, row) {
+                ids.push(row.pluginId);
+            });
+            $.each(ids, function(i, id) {
+                disable(id);
+            });
+        }
+
+        function test(pluginId) {
+            $.ajax({
+                url: prefix + '/test',
+                type: 'post',
+                data: { 'pluginId': pluginId },
+                success: function(data) {
+                    $.modal.msgSuccess(data.msg);
+                }
+            });
+        }
+
+        $('#btnTest').click(function() {
+            var rows = $('#bootstrap-table').bootstrapTable('getSelections');
+            if (rows.length != 1) {
+                $.modal.msgWarning('请选择一个插件进行测试');
+                return;
+            }
+            test(rows[0].pluginId);
+        });
+
+        $('#btnExcel').click(function() {
+            window.location.href = prefix + '/export?' + $('#formSearch').serialize();
+        });
+
+        $('#reset').click(function() {
+            $('#formSearch')[0].reset();
+        });
+    </script>
+</body>
+</html>

@@ -1,15 +1,10 @@
 package com.luckyframe.rc.entity;
 
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * WEB自动化测试用例步骤
  * @author lifengyang
  */
-@Getter
-@Setter
 public class RcWebCaseSteps {
     /** 包路径|定位路径 */
     private String stepPath;
@@ -27,4 +22,68 @@ public class RcWebCaseSteps {
     private String extend;
     /** 备注字段，用于接口类型的步骤的备注 */
     private String stepRemark;
+
+    public String getStepPath() {
+        return stepPath;
+    }
+
+    public void setStepPath(String stepPath) {
+        this.stepPath = stepPath;
+    }
+
+    public String getStepOperation() {
+        return stepOperation;
+    }
+
+    public void setStepOperation(String stepOperation) {
+        this.stepOperation = stepOperation;
+    }
+
+    public String getStepParameters() {
+        return stepParameters;
+    }
+
+    public void setStepParameters(String stepParameters) {
+        this.stepParameters = stepParameters;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getExpectedResult() {
+        return expectedResult;
+    }
+
+    public void setExpectedResult(String expectedResult) {
+        this.expectedResult = expectedResult;
+    }
+
+    public Integer getStepType() {
+        return stepType;
+    }
+
+    public void setStepType(Integer stepType) {
+        this.stepType = stepType;
+    }
+
+    public String getExtend() {
+        return extend;
+    }
+
+    public void setExtend(String extend) {
+        this.extend = extend;
+    }
+
+    public String getStepRemark() {
+        return stepRemark;
+    }
+
+    public void setStepRemark(String stepRemark) {
+        this.stepRemark = stepRemark;
+    }
 }

@@ -34,6 +34,8 @@ public class ProjectProtocolTemplate extends BaseEntity
 	private Integer isResponseHead;
 	/** 请求响应返回值是否带状态码 0不带 1带 */
 	private Integer isResponseCode;
+	/** 协议类型：HTTP、WebSocket、gRPC、MQTT等 */
+	private String protocolType;
 	/** 关联项目实体 */
 	private Project project;
 
@@ -126,6 +128,15 @@ public class ProjectProtocolTemplate extends BaseEntity
 	{
 		return isResponseCode;
 	}
+	public void setProtocolType(String protocolType) 
+	{
+		this.protocolType = protocolType;
+	}
+
+	public String getProtocolType() 
+	{
+		return protocolType;
+	}
 
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -138,6 +149,7 @@ public class ProjectProtocolTemplate extends BaseEntity
             .append("timeout", getTimeout())
             .append("isResponseHead", getIsResponseHead())
             .append("isResponseCode", getIsResponseCode())
+            .append("protocolType", getProtocolType())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

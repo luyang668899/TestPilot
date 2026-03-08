@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.plugin.mapper.PluginMapper">
+    <resultMap type="com.luckyframe.project.plugin.domain.Plugin" id="PluginResult">
+        <id property="pluginId" column="plugin_id" />
+        <result property="pluginName" column="plugin_name" />
+        <result property="pluginType" column="plugin_type" />
+        <result property="pluginVersion" column="plugin_version" />
+        <result property="pluginPath" column="plugin_path" />
+        <result property="status" column="status" />
+        <result property="description" column="description" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectPluginVo">
+        select plugin_id, plugin_name, plugin_type, plugin_version, plugin_path, status, description, create_by, create_time, update_by, update_time from plugin
+    </sql>
+
+    <select id="selectPluginById" parameterType="Integer" resultMap="PluginResult">
+        <include refid="selectPluginVo" />
+        where plugin_id = #{pluginId}
+    </select>
+
+    <select id="selectPluginList" parameterType="com.luckyframe.project.plugin.domain.Plugin" resultMap="PluginResult">
+        <include refid="selectPluginVo" />
+        <where>
+            <if test="pluginName != null and pluginName != ''">
+                and plugin_name like concat('%', #{pluginName}, '%')
+            </if>
+            <if test="pluginType != null and pluginType != ''">
+                and plugin_type = #{pluginType}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertPlugin" parameterType="com.luckyframe.project.plugin.domain.Plugin" useGeneratedKeys="true" keyProperty="pluginId">
+        insert into plugin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pluginName != null and pluginName != ''">
+                plugin_name,
+            </if>
+            <if test="pluginType != null and pluginType != ''">
+                plugin_type,
+            </if>
+            <if test="pluginVersion != null and pluginVersion != ''">
+                plugin_version,
+            </if>
+            <if test="pluginPath != null and pluginPath != ''">
+                plugin_path,
+            </if>
+            <if test="status != null and status != ''">
+                status,
+            </if>
+            <if test="description != null and description != ''">
+                description,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pluginName != null and pluginName != ''">
+                #{pluginName},
+            </if>
+            <if test="pluginType != null and pluginType != ''">
+                #{pluginType},
+            </if>
+            <if test="pluginVersion != null and pluginVersion != ''">
+                #{pluginVersion},
+            </if>
+            <if test="pluginPath != null and pluginPath != ''">
+                #{pluginPath},
+            </if>
+            <if test="status != null and status != ''">
+                #{status},
+            </if>
+            <if test="description != null and description != ''">
+                #{description},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updatePlugin" parameterType="com.luckyframe.project.plugin.domain.Plugin">
+        update plugin
+        <set>
+            <if test="pluginName != null and pluginName != ''">
+                plugin_name = #{pluginName},
+            </if>
+            <if test="pluginType != null and pluginType != ''">
+                plugin_type = #{pluginType},
+            </if>
+            <if test="pluginVersion != null and pluginVersion != ''">
+                plugin_version = #{pluginVersion},
+            </if>
+            <if test="pluginPath != null and pluginPath != ''">
+                plugin_path = #{pluginPath},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where plugin_id = #{pluginId}
+    </update>
+
+    <delete id="deletePluginById" parameterType="Integer">
+        delete from plugin where plugin_id = #{pluginId}
+    </delete>
+
+    <delete id="deletePluginByIds" parameterType="String">
+        delete from plugin where plugin_id in 
+        <foreach item="pluginId" collection="array" open="(" separator="," close=")">
+            #{pluginId}
+        </foreach>
+    </delete>
+</mapper>

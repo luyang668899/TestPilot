@@ -6,7 +6,7 @@
 
     <resultMap type="ProjectCaseParams" id="ProjectCaseParamsResult">
         <result property="paramsId"    column="params_id"    />
-        <result property="envName"    column="env_name"    />
+        <result property="environmentId"    column="environment_id"    />
         <result property="paramsName"    column="params_name"    />
         <result property="paramsValue"    column="params_value"    />
         <result property="projectId"    column="project_id"    />
@@ -16,6 +16,7 @@
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
         <association property="project"  column="project_id" javaType="Project" resultMap="ProjectResult" />
+        <association property="environment"  column="environment_id" javaType="ProjectEnvironment" resultMap="ProjectEnvironmentResult" />
     </resultMap>
 
     <resultMap type="Project" id="ProjectResult">
@@ -25,18 +26,28 @@
         <result property="projectSign"    column="project_sign"    />
     </resultMap>
 
+    <resultMap type="ProjectEnvironment" id="ProjectEnvironmentResult">
+        <id property="environmentId"    column="environment_id"    />
+        <result property="environmentName"    column="environment_name"    />
+        <result property="environmentDesc"    column="environment_desc"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="isDefault"    column="is_default"    />
+    </resultMap>
+
     <sql id="selectProjectCaseParamsVo">
-        select pcp.params_id, pcp.env_name,pcp.params_name, pcp.params_value, pcp.project_id, pcp.create_by, pcp.create_time, pcp.update_by, pcp.update_time, pcp.remark,
-               sp.project_name,sp.dept_id,sp.project_sign
+        select pcp.params_id, pcp.environment_id, pcp.params_name, pcp.params_value, pcp.project_id, pcp.create_by, pcp.create_time, pcp.update_by, pcp.update_time, pcp.remark,
+               sp.project_name, sp.dept_id, sp.project_sign,
+               pe.environment_name, pe.environment_desc, pe.is_default
         from project_case_params pcp
                  left join sys_project sp on pcp.project_id = sp.project_id
+                 left join project_environment pe on pcp.environment_id = pe.environment_id
     </sql>
 
     <select id="selectProjectCaseParamsList" parameterType="ProjectCaseParams" resultMap="ProjectCaseParamsResult">
         <include refid="selectProjectCaseParamsVo"/>
         <where>
             <if test="paramsId != null "> and pcp.params_id = #{paramsId}</if>
-            <if test="envName != null  and envName != '' "> and pcp.env_name like concat('%', #{envName}, '%')</if>
+            <if test="environmentId != null "> and pcp.environment_id = #{environmentId}</if>
             <if test="paramsName != null  and paramsName != '' "> and pcp.params_name like concat('%', #{paramsName}, '%')</if>
             <if test="paramsValue != null  and paramsValue != '' "> and pcp.params_value like concat('%', #{paramsValue}, '%')</if>
             <if test="projectId != null "> and pcp.project_id = #{projectId}</if>
@@ -59,18 +70,11 @@
         where pcp.project_id = #{projectId} or pcp.project_id = 0
     </select>
 
-    <select id="selectProjectCaseParamsListByProjectIdAndEnvName" resultMap="ProjectCaseParamsResult">
+    <select id="selectProjectCaseParamsListByProjectIdAndEnvironmentId" resultMap="ProjectCaseParamsResult">
         <include refid="selectProjectCaseParamsVo"/>
         <where>
-            <if test="envName != null  and envName != '' "> and (pcp.env_name = #{envName} or pcp.env_name="common")</if>
+            <if test="environmentId != null "> and pcp.environment_id = #{environmentId}</if>
             <if test="projectId != null and projectId!=0"> and (pcp.project_id = #{projectId} or pcp.project_id = 0)</if>
-        </where>
-    </select>
-
-    <select id="selectProjectEnvListByProjectId" resultType="java.lang.String">
-        select DISTINCT env_name from project_case_params t
-        <where>
-            <if test="projectId != null"> and t.project_id = #{projectId} and env_name!="common" </if>
         </where>
     </select>
 
@@ -78,7 +82,7 @@
         <include refid="selectProjectCaseParamsVo"/>
         <where>
             <if test="paramsName != null  and paramsName != '' "> and pcp.params_name = #{paramsName}</if>
-            <if test="envName != null  and envName != '' "> and pcp.env_name = #{envName}</if>
+            <if test="environmentId != null "> and pcp.environment_id = #{environmentId}</if>
             <if test="projectId != null and projectId!=0"> and (pcp.project_id = #{projectId} or pcp.project_id=0)</if>
         </where>
     </select>
@@ -86,7 +90,7 @@
     <insert id="insertProjectCaseParams" parameterType="ProjectCaseParams" useGeneratedKeys="true" keyProperty="paramsId">
         insert into project_case_params
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="envName != null  and envName != ''  ">env_name,</if>
+            <if test="environmentId != null  ">environment_id,</if>
             <if test="paramsName != null  and paramsName != ''  ">params_name,</if>
             <if test="paramsValue != null  and paramsValue != ''  ">params_value,</if>
             <if test="projectId != null  ">project_id,</if>
@@ -97,7 +101,7 @@
             <if test="remark != null  and remark != ''  ">remark,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="envName != null  and envName != ''  ">#{envName},</if>
+            <if test="environmentId != null  ">#{environmentId},</if>
             <if test="paramsName != null  and paramsName != ''  ">#{paramsName},</if>
             <if test="paramsValue != null  and paramsValue != ''  ">#{paramsValue},</if>
             <if test="projectId != null  ">#{projectId},</if>
@@ -112,7 +116,7 @@
     <update id="updateProjectCaseParams" parameterType="ProjectCaseParams">
         update project_case_params
         <trim prefix="SET" suffixOverrides=",">
-            <if test="envName != null  and envName != ''  ">env_name = #{envName},</if>
+            <if test="environmentId != null  ">environment_id = #{environmentId},</if>
             <if test="paramsName != null  and paramsName != ''  ">params_name = #{paramsName},</if>
             <if test="paramsValue != null  and paramsValue != ''  ">params_value = #{paramsValue},</if>
             <if test="projectId != null  ">project_id = #{projectId},</if>

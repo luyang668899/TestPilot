@@ -20,6 +20,8 @@ public class RunTaskEntity implements Serializable {
     private String taskId;
     /*驱动加载路径*/
     private String loadPath;
+    /*任务类型*/
+    private Integer taskType;
     
 	public String getSchedulingName() {
 		return schedulingName;
@@ -38,6 +40,14 @@ public class RunTaskEntity implements Serializable {
 	}
 	public void setLoadPath(String loadPath) {
 		this.loadPath = loadPath;
+	}
+
+	public Integer getTaskType() {
+		return taskType;
+	}
+
+	public void setTaskType(Integer taskType) {
+		this.taskType = taskType;
 	}
 
 }

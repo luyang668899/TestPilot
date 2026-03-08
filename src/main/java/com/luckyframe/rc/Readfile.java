@@ -1,7 +1,8 @@
 package com.luckyframe.rc;
 
 import com.luckyframe.rc.entity.RcWebCaseSteps;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -10,8 +11,8 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 
 
-@Slf4j
 public class Readfile {
+    private static final Logger log = LoggerFactory.getLogger(Readfile.class);
 
     /**
      * 保存活动

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑缺陷管理配置</title>
+    <#include "../common/head.html">
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>编辑缺陷管理配置</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link" href="${ctx}/testreport/defect">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form class="form-horizontal m-t" id="editForm">
+                            <input type="hidden" name="defectId" value="${defectManagement.defectId}">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">项目：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="projectId" id="projectId" required>
+                                        <option value="">请选择项目</option>
+                                        <#list projects as project>
+                                            <option value="${project.projectId}" <#if project.projectId == defectManagement.projectId>selected</#if>>${project.projectName}</option>
+                                        </#list>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">缺陷系统类型：</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="defectType" id="defectType" required>
+                                        <option value="">请选择缺陷系统类型</option>
+                                        <option value="1" <#if defectManagement.defectType == 1>selected</#if>>JIRA</option>
+                                        <option value="2" <#if defectManagement.defectType == 2>selected</#if>>Bugzilla</option>
+                                        <option value="3" <#if defectManagement.defectType == 3>selected</#if>>其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">缺陷系统名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="defectSystemName" id="defectSystemName" value="${defectManagement.defectSystemName}" placeholder="请输入缺陷系统名称" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">缺陷系统URL：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="defectSystemUrl" id="defectSystemUrl" value="${defectManagement.defectSystemUrl}" placeholder="请输入缺陷系统URL" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">用户名：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="username" id="username" value="${defectManagement.username}" placeholder="请输入用户名">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">密码：</label>
+                                <div class="col-sm-8">
+                                    <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+                                    <span class="help-block m-b-none">如果不修改密码，请保持为空</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">API令牌：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="apiToken" id="apiToken" value="${defectManagement.apiToken}" placeholder="请输入API令牌">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">状态：</label>
+                                <div class="col-sm-8">
+                                    <div class="radio radio-inline">
+                                        <input type="radio" name="status" id="status1" value="1" <#if defectManagement.status == 1>checked</#if>>
+                                        <label for="status1">启用</label>
+                                    </div>
+                                    <div class="radio radio-inline">
+                                        <input type="radio" name="status" id="status0" value="0" <#if defectManagement.status == 0>checked</#if>>
+                                        <label for="status0">禁用</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">描述：</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="请输入描述">${defectManagement.description}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-3">
+                                    <button type="button" class="btn btn-primary" onclick="testConnection()">
+                                        <i class="fa fa-plug"></i> 测试连接
+                                    </button>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> 保存
+                                    </button>
+                                    <button type="button" class="btn btn-default" onclick="window.location.href='${ctx}/testreport/defect'">
+                                        <i class="fa fa-undo"></i> 取消
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <#include "../common/foot.html">
+    <script type="text/javascript">
+        $(function() {
+            $('#editForm').validate({
+                submitHandler: function(form) {
+                    $.operate.save(form, ctx + "testreport/defect/edit");
+                }
+            });
+
+            // 项目选择变化时更新项目名称
+            $('#projectId').change(function() {
+                var projectId = $(this).val();
+                if (projectId) {
+                    var projectName = $(this).find('option:selected').text();
+                    $('input[name="projectName"]').val(projectName);
+                }
+            });
+        });
+
+        // 测试连接
+        function testConnection() {
+            var defectManagement = {
+                defectId: $('input[name="defectId"]').val(),
+                projectId: $('#projectId').val(),
+                defectType: $('#defectType').val(),
+                defectSystemUrl: $('#defectSystemUrl').val(),
+                username: $('#username').val(),
+                password: $('#password').val(),
+                apiToken: $('#apiToken').val()
+            };
+
+            if (!defectManagement.projectId) {
+                $.modal.alertWarning("请选择项目");
+                return;
+            }
+            if (!defectManagement.defectType) {
+                $.modal.alertWarning("请选择缺陷系统类型");
+                return;
+            }
+            if (!defectManagement.defectSystemUrl) {
+                $.modal.alertWarning("请输入缺陷系统URL");
+                return;
+            }
+
+            $.ajax({
+                type: "post",
+                url: ctx + "testreport/defect/testConnection",
+                data: defectManagement,
+                success: function(result) {
+                    $.modal.alertSuccess(result.msg);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

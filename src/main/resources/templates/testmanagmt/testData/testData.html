@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>测试数据管理</title>
+    <th:block th:include="include :: header" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>测试数据管理</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <form id="form" class="form-inline">
+                                    <div class="form-group">
+                                        <label class="control-label">项目名称：</label>
+                                        <select id="projectId" name="projectId" class="form-control m-b">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">环境名称：</label>
+                                        <select id="environmentId" name="environmentId" class="form-control m-b">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">数据名称：</label>
+                                        <input type="text" id="dataName" name="dataName" class="form-control m-b" placeholder="请输入数据名称">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">数据类型：</label>
+                                        <select id="dataType" name="dataType" class="form-control m-b">
+                                            <option value="">请选择</option>
+                                            <option value="string">字符串</option>
+                                            <option value="number">数字</option>
+                                            <option value="boolean">布尔值</option>
+                                            <option value="email">邮箱</option>
+                                            <option value="phone">手机号</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-primary" onclick="$.table.search()">
+                                            <i class="fa fa-search"></i> 查询
+                                        </button>
+                                        <button type="button" class="btn btn-default" onclick="$.form.reset()">
+                                            <i class="fa fa-refresh"></i> 重置
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success" onclick="$.operate.add()">
+                                        <i class="fa fa-plus"></i> 新增
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="generateTestData()">
+                                        <i class="fa fa-magic"></i> 生成数据
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="$.operate.edit()">
+                                        <i class="fa fa-pencil"></i> 修改
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="$.operate.removeAll()">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="$.table.exportExcel()">
+                                        <i class="fa fa-download"></i> 导出
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover" id="bootstrap-table"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-table-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "testmanagmt/testData";
+        
+        $(function() {
+            loadProjects();
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                columns: [
+                    {
+                        field: 'state',
+                        checkbox: true
+                    },
+                    {
+                        field: 'dataId',
+                        title: '测试数据ID',
+                        sortable: true
+                    },
+                    {
+                        field: 'projectId',
+                        title: '项目ID',
+                        sortable: true
+                    },
+                    {
+                        field: 'dataName',
+                        title: '数据名称',
+                        sortable: true
+                    },
+                    {
+                        field: 'dataType',
+                        title: '数据类型',
+                        sortable: true,
+                        formatter: function(value) {
+                            switch(value) {
+                                case 'string': return '字符串';
+                                case 'number': return '数字';
+                                case 'boolean': return '布尔值';
+                                case 'email': return '邮箱';
+                                case 'phone': return '手机号';
+                                default: return value;
+                            }
+                        }
+                    },
+                    {
+                        field: 'dataValue',
+                        title: '数据值',
+                        sortable: true
+                    },
+                    {
+                        field: 'environmentId',
+                        title: '环境ID',
+                        sortable: true
+                    },
+                    {
+                        field: 'description',
+                        title: '描述',
+                        sortable: true
+                    },
+                    {
+                        field: 'createBy',
+                        title: '创建人',
+                        sortable: true
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间',
+                        sortable: true
+                    },
+                    {
+                        field: 'updateBy',
+                        title: '更新人',
+                        sortable: true
+                    },
+                    {
+                        field: 'updateTime',
+                        title: '更新时间',
+                        sortable: true
+                    }
+                ]
+            };
+            $.table.init(options);
+        });
+        
+        function loadProjects() {
+            $.ajax({
+                url: prefix + "/projects",
+                type: 'get',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 0) {
+                        var projects = data.data;
+                        var projectSelect = $('#projectId');
+                        projectSelect.empty().append('<option value="">请选择</option>');
+                        $.each(projects, function(index, project) {
+                            projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+                        });
+                    }
+                }
+            });
+        }
+        
+        $('#projectId').change(function() {
+            var projectId = $(this).val();
+            if (projectId) {
+                loadEnvironments(projectId);
+            } else {
+                $('#environmentId').empty().append('<option value="">请选择</option>');
+            }
+        });
+        
+        function loadEnvironments(projectId) {
+            $.ajax({
+                url: prefix + "/environments",
+                type: 'get',
+                data: { projectId: projectId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 0) {
+                        var environments = data.data;
+                        var environmentSelect = $('#environmentId');
+                        environmentSelect.empty().append('<option value="">请选择</option>');
+                        $.each(environments, function(index, environment) {
+                            environmentSelect.append('<option value="' + environment.environmentId + '">' + environment.environmentName + '</option>');
+                        });
+                    }
+                }
+            });
+        }
+        
+        function generateTestData() {
+            var projectId = $('#projectId').val();
+            var environmentId = $('#environmentId').val();
+            if (!projectId) {
+                $.modal.alertWarning("请选择项目");
+                return;
+            }
+            if (!environmentId) {
+                $.modal.alertWarning("请选择环境");
+                return;
+            }
+            var dataType = $('#dataType').val();
+            if (!dataType) {
+                $.modal.alertWarning("请选择数据类型");
+                return;
+            }
+            var count = prompt("请输入生成数据数量:", 10);
+            if (count === null) return;
+            if (isNaN(count) || count <= 0) {
+                $.modal.alertWarning("请输入有效的数量");
+                return;
+            }
+            $.ajax({
+                url: prefix + "/generate",
+                type: 'post',
+                data: { projectId: projectId, environmentId: environmentId, dataType: dataType, count: count },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 0) {
+                        $.modal.alertSuccess("测试数据生成成功");
+                        $.table.search();
+                    } else {
+                        $.modal.alertError(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

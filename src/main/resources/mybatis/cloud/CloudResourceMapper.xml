@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyframe.project.cloud.mapper.CloudResourceMapper">
+    <resultMap type="com.luckyframe.project.cloud.domain.CloudResource" id="CloudResourceResult">
+        <id property="resourceId" column="resource_id" />
+        <result property="serviceId" column="service_id" />
+        <result property="resourceName" column="resource_name" />
+        <result property="resourceType" column="resource_type" />
+        <result property="resourceIdCloud" column="resource_id_cloud" />
+        <result property="status" column="status" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectCloudResourceVo">
+        select resource_id, service_id, resource_name, resource_type, resource_id_cloud, status, create_time, update_time, remark from cloud_resource
+    </sql>
+
+    <select id="selectCloudResourceByResourceId" parameterType="Integer" resultMap="CloudResourceResult">
+        <include refid="selectCloudResourceVo" />
+        where resource_id = #{resourceId}
+    </select>
+
+    <select id="selectCloudResourceList" parameterType="com.luckyframe.project.cloud.domain.CloudResource" resultMap="CloudResourceResult">
+        <include refid="selectCloudResourceVo" />
+        <where>
+            <if test="serviceId != null">
+                and service_id = #{serviceId}
+            </if>
+            <if test="resourceName != null and resourceName != ''">
+                and resource_name like concat('%', #{resourceName}, '%')
+            </if>
+            <if test="resourceType != null and resourceType != ''">
+                and resource_type = #{resourceType}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertCloudResource" parameterType="com.luckyframe.project.cloud.domain.CloudResource" useGeneratedKeys="true" keyProperty="resourceId">
+        insert into cloud_resource
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serviceId != null">service_id,</if>
+            <if test="resourceName != null">resource_name,</if>
+            <if test="resourceType != null">resource_type,</if>
+            <if test="resourceIdCloud != null">resource_id_cloud,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serviceId != null">#{serviceId},</if>
+            <if test="resourceName != null">#{resourceName},</if>
+            <if test="resourceType != null">#{resourceType},</if>
+            <if test="resourceIdCloud != null">#{resourceIdCloud},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCloudResource" parameterType="com.luckyframe.project.cloud.domain.CloudResource">
+        update cloud_resource
+        <set>
+            <if test="serviceId != null">service_id = #{serviceId},</if>
+            <if test="resourceName != null">resource_name = #{resourceName},</if>
+            <if test="resourceType != null">resource_type = #{resourceType},</if>
+            <if test="resourceIdCloud != null">resource_id_cloud = #{resourceIdCloud},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where resource_id = #{resourceId}
+    </update>
+
+    <delete id="deleteCloudResourceByResourceId" parameterType="Integer">
+        delete from cloud_resource where resource_id = #{resourceId}
+    </delete>
+
+    <delete id="deleteCloudResourceByResourceIds" parameterType="Integer[]">
+        delete from cloud_resource where resource_id in
+        <foreach item="resourceId" collection="array" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
+    </delete>
+
+    <select id="selectCloudResourceByServiceId" parameterType="Integer" resultMap="CloudResourceResult">
+        <include refid="selectCloudResourceVo" />
+        where service_id = #{serviceId}
+    </select>
+</mapper>
