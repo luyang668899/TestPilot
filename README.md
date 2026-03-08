@@ -35,7 +35,7 @@
 
 # 介绍
 
-**LuckyFrame 开源自动化测试平台 - 自动化测试 X 时代来了**
+**TestPilot 开源自动化测试平台 - 自动化测试 X 时代来了**
 
 ## TestPilot 扩展
 TestPilot 是基于 LuckyFrame 进行二次开发的开源自动化测试平台，在保留 LuckyFrame 核心功能的基础上，增加了以下特性：
