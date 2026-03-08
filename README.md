@@ -37,6 +37,16 @@
 
 **LuckyFrame 开源自动化测试平台 - 自动化测试 X 时代来了**
 
+## TestPilot 扩展
+TestPilot 是基于 LuckyFrame 进行二次开发的开源自动化测试平台，在保留 LuckyFrame 核心功能的基础上，增加了以下特性：
+- **云服务集成**：支持云资源管理和测试执行
+- **插件管理**：支持插件扩展系统功能
+- **CI/CD 集成**：与 Jenkins、GitLab、Docker、Kubernetes 集成
+- **环境管理**：统一管理测试环境
+- **测试数据管理**：集中管理测试数据
+- **缺陷管理**：跟踪和管理测试过程中发现的缺陷
+- **测试趋势分析**：分析测试执行的趋势
+
 # 我能做什么？
 
 - **分布式测试**：使用Web-Client的方式，Web端负责基本信息管理展示，Client负责用例执行，任意无限扩展客户端。
@@ -65,6 +75,10 @@
 
 # 用户手册
 > [【直达官网查看最新用户手册】](http://www.luckyframe.cn/book/yhsc/syschyy-24.html)
+> 本地用户手册：[USER_MANUAL.md](USER_MANUAL.md)
+
+# 开发文档
+> 本地开发文档：[DEVELOPMENT.md](DEVELOPMENT.md)
 
 # 版本更新
 > [【直达官网查看版本更新文章】](http://www.luckyframe.cn/dynamic.html)
